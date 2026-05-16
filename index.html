@@ -3,518 +3,921 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Starbucks Coffee Academy — Quiz Game</title>
+<title>Starbucks Coffee Academy — Training Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
-
   :root {
     --cream: #F5F0E8;
+    --cream-dark: #EDE6D6;
     --espresso: #2C1A0E;
+    --espresso-light: #3D2515;
     --roast: #6B3A1F;
     --caramel: #C47A2B;
     --gold: #E8A93A;
+    --gold-pale: rgba(232,169,58,0.15);
     --muted: #7A5C3A;
-    --border: rgba(107,58,31,0.2);
-    --card: #FFFDF8;
     --green: #1E3932;
+    --green-mid: #2D5248;
     --green-light: #00704A;
     --text: #1A1008;
+    --border: rgba(107,58,31,0.18);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* HERO */
-  .hero { background: var(--espresso); color: var(--cream); padding: 4rem 2rem 3rem; text-align: center; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(196,122,43,0.15) 0%, transparent 70%); pointer-events: none; }
-  .hero-badge { display: inline-block; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(232,169,58,0.4); padding: 6px 16px; border-radius: 2px; margin-bottom: 1.5rem; }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 400; line-height: 1.15; margin-bottom: 1rem; }
-  .hero h1 em { color: var(--gold); font-style: italic; }
-  .hero p { font-size: 1rem; color: rgba(245,240,232,0.7); max-width: 560px; margin: 0 auto 2rem; line-height: 1.7; }
+  html { scroll-behavior: smooth; }
 
-  /* NAV */
-  .chapter-nav { background: var(--espresso); border-top: 1px solid rgba(245,240,232,0.08); overflow-x: auto; scrollbar-width: none; position: sticky; top: 0; z-index: 100; text-align: center; }
-  .chapter-nav-inner { display: inline-flex; padding: 0 1.5rem; }
-  .chapter-nav::-webkit-scrollbar { display: none; }
-  .chapter-btn { flex-shrink: 0; padding: 14px 16px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: rgba(245,240,232,0.45); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; }
-  .chapter-btn:hover { color: rgba(245,240,232,0.8); }
-  .chapter-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
 
-  /* CONTENT */
-  .content { max-width: 820px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
-  .chapter { display: none; }
-  .chapter.active { display: block; animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
 
-  .chapter-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-  .chapter-num { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); margin-bottom: 0.5rem; }
-  .chapter-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 400; color: var(--espresso); line-height: 1.2; }
-  .chapter-header .subtitle { font-family: 'Libre Baskerville', serif; font-style: italic; color: var(--muted); margin-top: 0.5rem; font-size: 1rem; }
+  /* ─── HEADER / NAV ─── */
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2.5rem;
+    height: 64px;
+    background: rgba(44, 26, 14, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(232,169,58,0.12);
+  }
 
-  /* QUIZ */
-  .quiz-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
-  .quiz-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel); margin-bottom: 1rem; }
-  .quiz-q { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--espresso); margin-bottom: 1.25rem; line-height: 1.4; }
-  .quiz-options { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
-  .quiz-opt { padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 14px; background: none; text-align: left; font-family: 'DM Sans', sans-serif; transition: all 0.2s; color: var(--text); line-height: 1.5; }
-  .quiz-opt:hover:not(:disabled) { border-color: var(--caramel); background: rgba(196,122,43,0.04); }
-  .quiz-opt.correct { background: rgba(0,112,74,0.1); border-color: var(--green-light); color: var(--green); }
-  .quiz-opt.wrong { background: rgba(139,0,0,0.07); border-color: #8B0000; color: #8B0000; }
-  .quiz-opt:disabled { cursor: default; }
-  .quiz-feedback { font-size: 14px; line-height: 1.6; padding: 0.75rem 1rem; border-radius: 6px; display: none; margin-bottom: 0.5rem; }
-  .quiz-feedback.show { display: block; }
-  .quiz-feedback.correct { background: rgba(0,112,74,0.08); color: var(--green); }
-  .quiz-feedback.wrong { background: rgba(139,0,0,0.07); color: #8B0000; }
-  .quiz-next { margin-top: 1rem; padding: 0.6rem 1.5rem; background: var(--espresso); color: var(--gold); border: none; border-radius: 4px; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: none; font-family: 'DM Sans', sans-serif; }
-  .quiz-next.show { display: inline-block; }
-  .quiz-progress { font-size: 12px; color: var(--muted); margin-bottom: 1rem; }
-  .quiz-score { text-align: center; padding: 1.5rem; display: none; }
-  .quiz-score.show { display: block; }
-  .quiz-score .score-num { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--espresso); line-height: 1; }
-  .quiz-score .score-label { color: var(--muted); font-size: 14px; margin-top: 0.25rem; }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
 
-  /* NAV FOOTER */
-  .chapter-nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
-  .nav-btn { padding: 10px 20px; border: 1px solid var(--border); border-radius: 4px; background: none; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--muted); transition: all 0.2s; }
-  .nav-btn:hover { border-color: var(--caramel); color: var(--caramel); }
-  .nav-btn.primary { background: var(--espresso); color: var(--gold); border-color: var(--espresso); }
-  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
 
-  .intro-text { font-size: 15px; line-height: 1.8; color: #2a1a0a; margin-bottom: 1.5rem; }
-  .callout { background: var(--espresso); color: var(--cream); padding: 1.5rem 2rem; border-radius: 4px; margin: 2rem 0; position: relative; overflow: hidden; }
-  .callout::before { content: '\201C'; font-family: 'Playfair Display', serif; font-size: 5rem; color: rgba(232,169,58,0.2); position: absolute; top: -10px; left: 10px; line-height: 1; }
-  .callout p { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 1.05rem; line-height: 1.7; position: relative; z-index: 1; color: rgba(245,240,232,0.9); }
-  .callout cite { display: block; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); margin-top: 0.75rem; font-style: normal; }
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  .logo-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    font-weight: 400;
+  }
+
+  .header-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: var(--gold);
+    color: var(--espresso);
+    border-radius: 3px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .header-cta:hover {
+    background: #f0b83f;
+    transform: translateY(-1px);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    background: var(--espresso);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 5rem;
+    overflow: hidden;
+  }
+
+  /* Background coffee rings decoration */
+  .hero-rings {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(232,169,58,0.08);
+  }
+
+  .ring-1 { width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .ring-2 { width: 750px; height: 750px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: rgba(232,169,58,0.05); }
+  .ring-3 { width: 1050px; height: 1050px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: rgba(232,169,58,0.03); }
+
+  /* Glow blob */
+  .hero-glow {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(196,122,43,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Steam lines */
+  .steam {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 300px;
+    background: linear-gradient(to top, rgba(196,122,43,0.06), transparent);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(232,169,58,0.35);
+    padding: 7px 18px;
+    border-radius: 2px;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-badge::before,
+  .hero-badge::after {
+    content: '✦';
+    font-size: 8px;
+    opacity: 0.6;
+  }
+
+  .hero h1 {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1.08;
+    max-width: 800px;
+    margin: 0 auto 1.5rem;
+    animation: fadeUp 0.8s ease 0.15s both;
+  }
+
+  .hero h1 em {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .hero h1 .line-break { display: block; }
+
+  .hero-sub {
+    position: relative;
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: rgba(245,240,232,0.6);
+    max-width: 560px;
+    margin: 0 auto 3rem;
+    line-height: 1.75;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+
+  .hero-actions {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s ease 0.45s both;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: var(--gold);
+    color: var(--espresso);
+    border-radius: 3px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s;
+    box-shadow: 0 4px 24px rgba(232,169,58,0.25);
+  }
+
+  .btn-primary:hover {
+    background: #f0b83f;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(232,169,58,0.35);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(245,240,232,0.25);
+    border-radius: 3px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(245,240,232,0.5);
+    background: rgba(245,240,232,0.06);
+    transform: translateY(-1px);
+  }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(245,240,232,0.35);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: fadeUp 1s ease 0.8s both;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(232,169,58,0.5), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    background: var(--green);
+    border-top: 1px solid rgba(0,112,74,0.4);
+    border-bottom: 1px solid rgba(0,112,74,0.4);
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem 2rem;
+    border-right: 1px solid rgba(245,240,232,0.08);
+    position: relative;
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    margin-top: 0.4rem;
+    display: block;
+  }
+
+  /* ─── MODULES SECTION ─── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--caramel);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    color: var(--espresso);
+    line-height: 1.15;
+  }
+
+  .section-title em { color: var(--caramel); font-style: italic; }
+
+  .section-desc {
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1rem;
+    margin-top: 0.75rem;
+    line-height: 1.7;
+  }
+
+  /* Module Cards Grid */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .module-card {
+    background: #FFFDF8;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .module-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    opacity: 0;
+    background: var(--gold-pale);
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(44,26,14,0.12);
+    border-color: rgba(196,122,43,0.4);
+  }
+
+  .module-card:hover::before { opacity: 1; }
+
+  .card-stripe {
+    height: 5px;
+    background: linear-gradient(90deg, var(--caramel), var(--gold));
+  }
+
+  .card-stripe.green { background: linear-gradient(90deg, var(--green), var(--green-light)); }
+  .card-stripe.dark  { background: linear-gradient(90deg, var(--espresso), var(--roast)); }
+
+  .card-body {
+    padding: 1.75rem 1.75rem 1.25rem;
+    flex: 1;
+  }
+
+  .card-num {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--caramel);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--espresso);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .card-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card-footer {
+    padding: 1rem 1.75rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-meta {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-meta-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .card-arrow {
+    font-size: 18px;
+    color: var(--caramel);
+    transition: transform 0.2s;
+  }
+
+  .module-card:hover .card-arrow { transform: translateX(4px); }
+
+  /* ─── CALLOUT / QUOTE STRIP ─── */
+  .quote-strip {
+    background: var(--espresso);
+    padding: 5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quote-strip::before {
+    content: '\201C';
+    font-family: 'Playfair Display', serif;
+    font-size: 20rem;
+    color: rgba(232,169,58,0.05);
+    position: absolute;
+    top: -4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .quote-strip blockquote {
+    position: relative;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .quote-strip p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    color: var(--cream);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .quote-strip cite {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 1.5rem;
+    font-style: normal;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  .how-section {
+    background: var(--cream-dark);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    margin-top: 3rem;
+  }
+
+  .step {
+    padding: 2rem 2.5rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+
+  .step:last-child { border-right: none; }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 400;
+    color: rgba(196,122,43,0.2);
+    line-height: 1;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--espresso);
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ─── FOOTER ─── */
+  .site-footer {
+    background: var(--espresso);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-top: 1px solid rgba(232,169,58,0.1);
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-logo span { color: var(--gold); font-style: italic; }
+
+  .footer-tagline {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.35);
+    margin-bottom: 2rem;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .footer-links a {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--gold); }
+
+  .footer-copy {
+    font-size: 12px;
+    color: rgba(245,240,232,0.2);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+    50%       { opacity: 0.4; transform: scaleY(0.6); transform-origin: top; }
+  }
+
+  /* Scroll-triggered reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 700px) {
+    .site-header { padding: 0 1.25rem; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .stat-item:nth-child(2) { border-right: none; }
+    .stat-item:nth-child(3) { border-top: 1px solid rgba(245,240,232,0.08); }
+    .steps-grid { grid-template-columns: 1fr; }
+    .step { border-right: none; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; max-width: 300px; }
+    .header-cta span { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-badge">Starbucks Coffee Academy · Quiz Game</div>
-  <h1>Test Your <em>Coffee</em> Knowledge</h1>
-  <p>Five modules, 10 random questions each — drawn from a pool of 200 per module. Every attempt is unique. How well do you really know your craft?</p>
+<!-- ─── HEADER ─── -->
+<header class="site-header">
+  <a href="#" class="logo">
+    <div class="logo-icon">☕</div>
+    <div class="logo-text">
+      Coffee Academy
+      <span class="logo-sub">Starbucks · Partner Training</span>
+    </div>
+  </a>
+  <a href="#" onclick="openQuiz(event)" class="header-cta">
+    <span>Start Quiz</span> →
+  </a>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-rings">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+  </div>
+  <div class="hero-glow"></div>
+  <div class="steam"></div>
+
+  <div class="hero-badge">Partner Training Programme</div>
+
+  <h1>
+    Master the Art of
+    <span class="line-break"><em>Coffee.</em></span>
+  </h1>
+
+  <p class="hero-sub">
+    Five modules, 1,000 questions, one cup of knowledge at a time.
+    Test your expertise across every dimension of craft.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#" onclick="openQuiz(event)" class="btn-primary">Begin Training ✦</a>
+    <a href="#modules" class="btn-secondary">Explore Modules ↓</a>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ─── STATS BAR ─── -->
+<div class="stats-bar">
+  <div class="stat-item reveal">
+    <span class="stat-num">5</span>
+    <span class="stat-label">Training Modules</span>
+  </div>
+  <div class="stat-item reveal reveal-delay-1">
+    <span class="stat-num">1,000</span>
+    <span class="stat-label">Total Questions</span>
+  </div>
+  <div class="stat-item reveal reveal-delay-2">
+    <span class="stat-num">10</span>
+    <span class="stat-label">Questions per Round</span>
+  </div>
+  <div class="stat-item reveal reveal-delay-3">
+    <span class="stat-num">∞</span>
+    <span class="stat-label">Unique Attempts</span>
+  </div>
 </div>
 
-<nav class="chapter-nav">
-  <div class="chapter-nav-inner">
-    <button class="chapter-btn active" onclick="showModule(0)">I · Barista Basics</button>
-    <button class="chapter-btn" onclick="showModule(1)">II · Barista Trainer</button>
-    <button class="chapter-btn" onclick="showModule(2)">III · Brew & Craft</button>
-    <button class="chapter-btn" onclick="showModule(3)">IV · Roast & Blend</button>
-    <button class="chapter-btn" onclick="showModule(4)">V · Origin & Ethics</button>
+<!-- ─── MODULES ─── -->
+<section class="section" id="modules">
+  <div class="section-header reveal">
+    <span class="section-eyebrow">The Curriculum</span>
+    <h2 class="section-title">Five Paths to <em>Mastery</em></h2>
+    <p class="section-desc">Each module draws 10 random questions from a bank of 200. No two attempts are the same.</p>
   </div>
-</nav>
 
-<div class="content">
+  <div class="modules-grid">
 
-<!-- MODULE 0: BARISTA BASICS -->
-<div class="chapter active" id="mod0">
-  <div class="chapter-header">
-    <div class="chapter-num">Module I</div>
-    <h2>Barista Basics</h2>
-    <div class="subtitle">Mission, values, customer service, espresso bar, tea & store operations.</div>
+    <a href="#" onclick="openQuiz(event)" class="module-card reveal reveal-delay-1">
+      <div class="card-stripe"></div>
+      <div class="card-body">
+        <span class="card-num">Module I</span>
+        <h3 class="card-title">Barista Basics</h3>
+        <p class="card-subtitle">Mission, values, customer connection, espresso bar fundamentals, tea, and store operations.</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta"><span class="card-meta-dot"></span> 200 questions · Foundational</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" onclick="openQuiz(event)" class="module-card reveal reveal-delay-2">
+      <div class="card-stripe dark"></div>
+      <div class="card-body">
+        <span class="card-num">Module II</span>
+        <h3 class="card-title">Barista Trainer</h3>
+        <p class="card-subtitle">Teaching models, learning styles, coaching frameworks, and developing fellow partners.</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta"><span class="card-meta-dot"></span> 200 questions · Intermediate</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" onclick="openQuiz(event)" class="module-card reveal reveal-delay-3">
+      <div class="card-stripe"></div>
+      <div class="card-body">
+        <span class="card-num">Module III</span>
+        <h3 class="card-title">Brew &amp; Craft</h3>
+        <p class="card-subtitle">Sensory science, espresso mastery, milk steaming, latte art, and extraction theory.</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta"><span class="card-meta-dot"></span> 200 questions · Advanced</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" onclick="openQuiz(event)" class="module-card reveal reveal-delay-4">
+      <div class="card-stripe dark"></div>
+      <div class="card-body">
+        <span class="card-num">Module IV</span>
+        <h3 class="card-title">Roast &amp; Blend</h3>
+        <p class="card-subtitle">Roasting history, green coffee transformation, roast profiles, and blending philosophy.</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta"><span class="card-meta-dot"></span> 200 questions · Advanced</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" onclick="openQuiz(event)" class="module-card reveal reveal-delay-5">
+      <div class="card-stripe green"></div>
+      <div class="card-body">
+        <span class="card-num">Module V</span>
+        <h3 class="card-title">Origin &amp; Ethics</h3>
+        <p class="card-subtitle">Coffee history, growing regions, processing methods, and C.A.F.E. Practices sourcing.</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta"><span class="card-meta-dot"></span> 200 questions · Expert</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
   </div>
-  <div class="callout">
+</section>
+
+<!-- ─── QUOTE ─── -->
+<div class="quote-strip">
+  <blockquote>
     <p>To inspire and nurture the human spirit — one person, one cup, and one neighborhood at a time.</p>
     <cite>— Starbucks Mission Statement</cite>
-  </div>
-  <p class="intro-text">Ten questions drawn randomly from a bank of 200. Each retry gives you a fresh set. Master these fundamentals before moving on.</p>
-  <div id="quiz_mod0"></div>
-  <div class="chapter-nav-footer">
-    <button class="nav-btn" disabled>← Previous</button>
-    <button class="nav-btn primary" onclick="showModule(1)">Barista Trainer →</button>
-  </div>
+  </blockquote>
 </div>
 
-<!-- MODULE 1: BARISTA TRAINER -->
-<div class="chapter" id="mod1">
-  <div class="chapter-header">
-    <div class="chapter-num">Module II</div>
-    <h2>Barista Trainer</h2>
-    <div class="subtitle">Teaching models, learning styles, coaching and feedback frameworks.</div>
-  </div>
-  <div class="callout">
-    <p>The best trainers don't just transfer knowledge — they ignite curiosity and build confidence in the people they develop.</p>
-    <cite>— Starbucks Training Philosophy</cite>
-  </div>
-  <p class="intro-text">Ten questions drawn randomly from a bank of 200 covering how to train, coach, and develop fellow partners effectively.</p>
-  <div id="quiz_mod1"></div>
-  <div class="chapter-nav-footer">
-    <button class="nav-btn" onclick="showModule(0)">← Barista Basics</button>
-    <button class="nav-btn primary" onclick="showModule(2)">Brew & Craft →</button>
-  </div>
-</div>
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how-section">
+  <div class="section" style="padding-top: 5rem; padding-bottom: 5rem;">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">How it works</span>
+      <h2 class="section-title">Built for <em>Real Learning</em></h2>
+    </div>
 
-<!-- MODULE 2: BREW & CRAFT -->
-<div class="chapter" id="mod2">
-  <div class="chapter-header">
-    <div class="chapter-num">Module III</div>
-    <h2>Brew &amp; Craft</h2>
-    <div class="subtitle">Sensory science, espresso mastery, milk steaming, latte art & extraction.</div>
+    <div class="steps-grid">
+      <div class="step reveal reveal-delay-1">
+        <span class="step-num">01</span>
+        <h3 class="step-title">Choose a Module</h3>
+        <p class="step-desc">Pick any of the five training modules — from Barista Basics all the way to Origin & Ethics.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <span class="step-num">02</span>
+        <h3 class="step-title">10 Random Questions</h3>
+        <p class="step-desc">Each session draws 10 unique questions from a pool of 200. Every attempt presents a fresh challenge.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <span class="step-num">03</span>
+        <h3 class="step-title">Learn from Feedback</h3>
+        <p class="step-desc">After each answer, get expert feedback explaining the why behind every correct response.</p>
+      </div>
+      <div class="step reveal reveal-delay-4">
+        <span class="step-num">04</span>
+        <h3 class="step-title">Keep Practicing</h3>
+        <p class="step-desc">Track your score and retry until you've mastered each module. With 200 questions per pool, repetition never feels repetitive.</p>
+      </div>
+    </div>
   </div>
-  <div class="callout">
-    <p>Every shot of espresso is a living thing — temperature, pressure, grind, and time in perfect tension.</p>
-    <cite>— Espresso Mastery Principle</cite>
-  </div>
-  <p class="intro-text">Ten questions drawn randomly from a bank of 200 on the science and craft behind every beverage we serve.</p>
-  <div id="quiz_mod2"></div>
-  <div class="chapter-nav-footer">
-    <button class="nav-btn" onclick="showModule(1)">← Barista Trainer</button>
-    <button class="nav-btn primary" onclick="showModule(3)">Roast & Blend →</button>
-  </div>
-</div>
+</section>
 
-<!-- MODULE 3: ROAST & BLEND -->
-<div class="chapter" id="mod3">
-  <div class="chapter-header">
-    <div class="chapter-num">Module IV</div>
-    <h2>Roast &amp; Blend</h2>
-    <div class="subtitle">Roasting history, transforming green coffee, blending philosophy & craft.</div>
-  </div>
-  <div class="callout">
-    <p>Roasting is where potential is unlocked — the same green bean can become a hundred different coffees depending on the heat and time applied.</p>
-    <cite>— Starbucks Roasting Philosophy</cite>
-  </div>
-  <p class="intro-text">Ten questions drawn randomly from a bank of 200 on roasting science, Starbucks roast profiles, and the art of blending.</p>
-  <div id="quiz_mod3"></div>
-  <div class="chapter-nav-footer">
-    <button class="nav-btn" onclick="showModule(2)">← Brew & Craft</button>
-    <button class="nav-btn primary" onclick="showModule(4)">Origin & Ethics →</button>
-  </div>
-</div>
+<!-- ─── FOOTER CTA ─── -->
+<section style="background: var(--cream-dark); padding: 5rem 2rem; text-align: center; border-top: 1px solid var(--border);">
+  <span class="section-eyebrow reveal">Ready to begin?</span>
+  <h2 class="section-title reveal" style="margin: 0.75rem auto 1.5rem; max-width: 500px;">Your <em>Coffee Journey</em> Starts Here</h2>
+  <a href="#" onclick="openQuiz(event)" class="btn-primary reveal" style="display: inline-flex; margin-top: 0.5rem;">Enter the Academy ✦</a>
+</section>
 
-<!-- MODULE 4: ORIGIN & ETHICS -->
-<div class="chapter" id="mod4">
-  <div class="chapter-header">
-    <div class="chapter-num">Module V</div>
-    <h2>Origin &amp; Ethics</h2>
-    <div class="subtitle">Coffee history, growing regions, processing methods & C.A.F.E. Practices.</div>
+<!-- ─── FOOTER ─── -->
+<footer class="site-footer">
+  <div class="footer-logo">Starbucks <span>Coffee Academy</span></div>
+  <div class="footer-tagline">Partner Training · Knowledge Matters</div>
+  <div class="footer-links">
+    <a href="#" onclick="openQuiz(event)">All Modules</a>
+    <a href="#" onclick="openQuiz(event)">Barista Basics</a>
+    <a href="#" onclick="openQuiz(event)">Brew & Craft</a>
+    <a href="#" onclick="openQuiz(event)">Origin & Ethics</a>
   </div>
-  <div class="callout">
-    <p>Coffee connects us to people and places most of us will never visit — every cup is a handshake with a farmer thousands of miles away.</p>
-    <cite>— Starbucks Origin Philosophy</cite>
-  </div>
-  <p class="intro-text">Ten questions drawn randomly from a bank of 200 on where coffee comes from, how it's grown, and our responsibility to the supply chain.</p>
-  <div id="quiz_mod4"></div>
-  <div class="chapter-nav-footer">
-    <button class="nav-btn" onclick="showModule(3)">← Roast & Blend</button>
-    <button class="nav-btn" disabled>End of Academy →</button>
-  </div>
-</div>
-
-</div><!-- /content -->
+  <div class="footer-copy">© Starbucks Coffee Academy · Partner Training Resource</div>
+</footer>
 
 <script>
-// ─── NAVIGATION ───────────────────────────────────────────────────────────────
-function showModule(i) {
-  document.querySelectorAll('.chapter').forEach((c,idx) => c.classList.toggle('active', idx === i));
-  document.querySelectorAll('.chapter-btn').forEach((b,idx) => b.classList.toggle('active', idx === i));
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
 
-// ─── QUIZ ENGINE ──────────────────────────────────────────────────────────────
-function pickRandom(pool, n) {
-  return [...pool].sort(() => Math.random() - 0.5).slice(0, n);
-}
-
-// Shuffle answer options and return {shuffledOpts, newCorrectIdx}
-function shuffleOpts(opts, correctIdx) {
-  const correct = opts[correctIdx];
-  const shuffled = [...opts].sort(() => Math.random() - 0.5);
-  return { shuffledOpts: shuffled, newCorrectIdx: shuffled.indexOf(correct) };
-}
-
-function buildQuiz(containerId, pool, modIdx) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  const rawQuestions = pickRandom(pool, 10);
-  // Pre-shuffle options for each question so correct answer is in random position
-  const questions = rawQuestions.map(q => {
-    const { shuffledOpts, newCorrectIdx } = shuffleOpts(q.opts, q.answer);
-    return { ...q, opts: shuffledOpts, answer: newCorrectIdx };
-  });
-  let cur = 0, score = 0;
-
-  function render() {
-    if (cur >= questions.length) {
-      const pct = Math.round((score / questions.length) * 100);
-      const msg = pct === 100 ? 'Perfect — you\'ve mastered this module!' :
-                  pct >= 80  ? 'Excellent work — nearly flawless!' :
-                  pct >= 60  ? 'Good effort! Review and try again.' :
-                               'Keep studying — you\'ve got this!';
-      container.innerHTML = `<div class="quiz-wrap">
-        <div class="quiz-label">Module Quiz Complete</div>
-        <div class="quiz-score show">
-          <div class="score-num">${score}/${questions.length}</div>
-          <div class="score-label">Questions Correct — ${pct}%</div>
-          <p style="margin-top:1rem;font-size:14px;color:var(--muted)">${msg}</p>
-          <button class="nav-btn primary" style="margin-top:1.25rem" onclick="buildQuiz('${containerId}', pools[${modIdx}], ${modIdx})">↺ New Random Quiz</button>
-        </div>
-      </div>`;
-      return;
-    }
-    const q = questions[cur];
-    const optsHtml = q.opts.map((o, i) =>
-      `<button class="quiz-opt" onclick="answerQ(this,${i},${q.answer},'${containerId}',${cur})">${o}</button>`
-    ).join('');
-    container.innerHTML = `<div class="quiz-wrap">
-      <div class="quiz-label">Module Quiz — 10 Questions</div>
-      <div class="quiz-progress">Question ${cur + 1} of ${questions.length}</div>
-      <div class="quiz-q">${q.q}</div>
-      <div class="quiz-options">${optsHtml}</div>
-      <div class="quiz-feedback" id="qfb_${containerId}"></div>
-      <button class="quiz-next" id="qnx_${containerId}" onclick="nextQ('${containerId}')">Next →</button>
-    </div>`;
+  function openQuiz(e) {
+    e.preventDefault();
+    // Build path to Quiz_Game.html relative to current file on Android content:// URLs
+    var loc = window.location.href;
+    var base = loc.substring(0, loc.lastIndexOf('/') + 1);
+    window.location.href = base + 'Quiz_Game.html';
   }
+  // Scroll-triggered reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
 
-  window['_state_' + containerId] = { render, questions, get cur() { return cur; }, inc() { cur++; }, addScore() { score++; } };
-  render();
-}
+  reveals.forEach(el => observer.observe(el));
 
-function answerQ(btn, chosen, correct, cid, qIdx) {
-  const wrap = btn.closest('.quiz-wrap');
-  wrap.querySelectorAll('.quiz-opt').forEach((b, i) => {
-    b.disabled = true;
-    if (i === correct) b.classList.add('correct');
-    else if (i === chosen) b.classList.add('wrong');
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   });
-  const state = window['_state_' + cid];
-  const q = state.questions[qIdx];
-  const fb = document.getElementById('qfb_' + cid);
-  const isCorrect = chosen === correct;
-  if (isCorrect) state.addScore();
-  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'wrong');
-  fb.textContent = q.feedback;
-  const nxt = document.getElementById('qnx_' + cid);
-  nxt.classList.add('show');
-}
-
-function nextQ(cid) {
-  const state = window['_state_' + cid];
-  state.inc();
-  state.render();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// QUESTION BANKS — 200 per module
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// ─── MODULE 0: BARISTA BASICS (200 questions) ─────────────────────────────────
-const mod0Pool = [
-  // MISSION & VALUES (1-40)
-  { q: "What is the complete Starbucks mission statement?", opts: ["To serve the highest quality coffee in a welcoming environment for every customer", "To inspire and nurture the human spirit — one person, one cup, and one neighborhood at a time", "To be the world's most recognized coffee brand through excellence and innovation", "To create a community of coffee lovers united by a passion for quality and sustainability"], answer: 1, feedback: "Starbucks' mission is to inspire and nurture the human spirit — one person, one cup, and one neighborhood at a time. It centers on human connection, not just the product, reminding every partner that coffee is simply the vehicle through which we create meaningful moments." },
-  { q: "Which of the following is one of Starbucks' five core values?", opts: ["Efficiency — delivering drinks faster than competitors", "Craft — delighting in the rigor of details and pursuing excellence with passion", "Profit — consistently growing shareholder returns above industry benchmarks", "Popularity — maintaining market leadership in every region we operate"], answer: 1, feedback: "Craft is one of Starbucks' five values: we delight in the rigor of the details — no matter what our job is. We learn and teach in the pursuit of growth and deliver excellence with passion and creativity. The other four values are Results, Courage, Belonging, and Joy." },
-  { q: "What does the Starbucks value 'Belonging' mean in practice?", opts: ["Offering loyalty rewards so customers feel like members of an exclusive club", "Actively listening, connecting with warmth, recognizing every person, and treating each other with dignity and care", "Ensuring that all partner uniforms match and stores have a consistent look worldwide", "Creating a brand identity that appeals to a broad global audience across demographics"], answer: 1, feedback: "Belonging means we actively listen and connect with warmth and transparency, we recognize and appreciate every person for who they are, and we treat each other with dignity and care. It's about creating genuine inclusion — not superficial hospitality." },
-  { q: "What is Starbucks' promise to its customers?", opts: ["To deliver every order in under three minutes, guaranteed", "To uplift the everyday — making each customer's day a little better", "To provide the lowest price on specialty coffee in their neighborhood", "To remember every regular customer's name and usual order"], answer: 1, feedback: "Starbucks' promise to customers is to uplift the everyday. This goes beyond transactions — it's about making someone's morning better, their afternoon brighter, or their break more meaningful. Every interaction is an opportunity to deliver on that promise." },
-  { q: "What are Starbucks' six stakeholder promises in total?", opts: ["Customers, partners, shareholders, suppliers, regulators, community leaders", "Partners, customers, farmers, communities, environment, shareholders", "Employees, customers, investors, government, media, vendors", "Baristas, managers, district leaders, executives, farmers, retailers"], answer: 1, feedback: "Starbucks has six promises: For Partners (bridge to a better future), For Customers (uplift the everyday), For Farmers (ensure the future of coffee for all), For Communities (contribute positively), For Our Environment (give more than we take), and For Shareholders (generate long-term returns)." },
-  { q: "What is the Starbucks 'Third Place' concept?", opts: ["A third-party delivery service used to reach customers at home or work", "A relaxing space other than home or work where people feel a sense of belonging", "A premium tier of the Starbucks Rewards loyalty program", "The third shift of the day between afternoon and evening rush periods"], answer: 1, feedback: "The Third Place is a relaxing space other than home (first place) or work (second place) — somewhere free from outside worries where people feel a sense of belonging. Today, Starbucks also recognizes a Fourth Place: the digital or virtual space where customers connect with the brand." },
-  { q: "Why does Starbucks refer to its employees as 'partners' rather than employees?", opts: ["It is a legal distinction that changes how labor laws apply to staff members", "Because they share in the company's success and are empowered to be part of something bigger", "It is a branding decision to differentiate Starbucks from fast-food competitors", "Because all Starbucks staff members hold equity stakes in their local franchise"], answer: 1, feedback: "Starbucks calls employees 'partners' because they share in the company's success through benefits like Bean Stock equity, and are empowered as brand ambassadors, storytellers, and community builders. The green apron is a symbol of that identity — you are more than someone who makes drinks." },
-  { q: "What does the Starbucks value 'Courage' require of partners?", opts: ["Willingness to work double shifts during the busiest periods of the year", "Embracing difficult conversations with respect, pursuing audacious ideas, and doing the right thing even when it's hard", "Taking bold risks with new beverage recipes to push innovation at the store level", "Reporting safety violations immediately even if it means slowing down service"], answer: 1, feedback: "Courage means we embrace difficult conversations, with respect, to make us all better. We pursue audacious ideas beyond our comfort zone. We do the right things, even when it's hard. Courage is not just about big moments — it shows up in everyday interactions with partners and customers." },
-  { q: "What does the Starbucks value 'Joy' ask of partners?", opts: ["Smiling at all customers regardless of personal circumstances or mood", "Taking pride in your work, having fun doing it, celebrating each other, and creating great vibes", "Organizing fun in-store events to increase foot traffic and customer engagement", "Maintaining an upbeat social media presence on behalf of the Starbucks brand"], answer: 1, feedback: "Joy means we take pride in our work and have fun while doing it. We celebrate each other and our wins. We create great vibes to bring the best out of others. It's about genuine enjoyment — not forced positivity — and bringing energy that uplifts those around you." },
-  { q: "What does the Starbucks value 'Results' mean for a barista?", opts: ["Hitting the highest transaction count among peers during every shift worked", "Consistently achieving goals with focus, integrity, and drive, while exceeding expectations of those we serve", "Producing the most drinks per hour according to store performance tracking dashboards", "Reducing waste and operating costs through smart resource management on every shift"], answer: 1, feedback: "Results means we consistently achieve our goals with focus, integrity, and drive. We continuously innovate to stay ahead. We exceed the expectations of the people we serve. For a barista, this means quality, consistency, and going beyond the minimum every single day." },
-  { q: "How does Starbucks 'do business with a social conscience'?", opts: ["By donating a percentage of every purchase to environmental charities automatically", "By being globally responsible, creating opportunities, and strengthening communities through investment and service", "By only sourcing products from countries that meet international labor standards", "By offering fair-trade certified products across its entire beverage and food menu"], answer: 1, feedback: "Starbucks' social conscience means being globally responsible (helping farmers and suppliers thrive), creating opportunities (training, employment, civic engagement), and strengthening communities (service, disaster relief, food donations). These aren't PR moves — they are core to why Starbucks exists." },
-  { q: "What is the promise Starbucks makes specifically to its farmers?", opts: ["To purchase all coffee at a price guaranteed to be 20% above commodity market rates", "To ensure the future of coffee for all through ethical sourcing and sustainable practices", "To source exclusively from farms that have earned organic certification", "To visit every farm annually to verify that working conditions meet Starbucks standards"], answer: 1, feedback: "Starbucks' promise to farmers is to ensure the future of coffee for all. This is delivered through programs like C.A.F.E. Practices, which verifies social, environmental, and economic standards across the supply chain — ensuring farming communities can remain viable for generations." },
-  { q: "What does Starbucks mean by 'leading through reinvention, risk and ideas'?", opts: ["Changing store layouts every quarter to keep the customer experience fresh", "Continuously innovating products, services, and ways of working — not staying comfortable with the status quo", "Taking financial risks by opening stores in underserved markets ahead of demand", "Encouraging baristas to improvise new drinks and offer them to loyal customers"], answer: 1, feedback: "Leading through reinvention, risk, and ideas is one of Starbucks' strategic intentions. It means the company (and by extension, every partner) should not settle for what already works — there is always a better cup, a better experience, a better way to connect. Innovation is a cultural expectation." },
-  { q: "What does 'We Care Through Coffee' mean in Starbucks' strategic context?", opts: ["Every beverage sold contributes directly to coffee farming aid programs", "Coffee is the medium through which Starbucks expresses care for people, communities, and the world", "The company provides free coffee to community organizations and non-profits annually", "Partners are trained to share coffee knowledge with customers as a form of hospitality"], answer: 1, feedback: "'We care through coffee' means that coffee is the vehicle Starbucks uses to express its values — care for partners, customers, farmers, communities, and the environment. The cup is not the end goal; it is the means by which human connection and positive impact are delivered." },
-  { q: "What is the Starbucks promise to the environment?", opts: ["To achieve carbon neutrality across all stores by reducing energy consumption by 50%", "To give more than we take — pursuing sustainability across water, waste, and climate", "To plant one tree for every 100 bags of coffee sourced from farming regions globally", "To eliminate all single-use plastic from stores in every country by 2025"], answer: 1, feedback: "Starbucks' promise to the environment is to give more than we take. This commitment spans multiple fronts: reducing water usage, cutting carbon emissions, tackling waste, and investing in environmental restoration. It reflects the understanding that Starbucks' long-term viability depends on a healthy planet." },
-  { q: "How many core values does Starbucks have, and what are they?", opts: ["Three values: Craft, Connection, and Community", "Five values: Craft, Results, Courage, Belonging, and Joy", "Seven values: Quality, Integrity, Service, Excellence, Joy, Courage, and Belonging", "Four values: Craft, Community, Courage, and Connection"], answer: 1, feedback: "Starbucks has five values: Craft (delight in the rigor of details), Results (achieve goals with integrity and drive), Courage (embrace difficult conversations, do the right thing), Belonging (every person is seen, valued, respected), and Joy (take pride, have fun, celebrate each other)." },
-  { q: "What does it mean for Starbucks to 'bridge to a better future' for its partners?", opts: ["Providing a clear career path from barista to district manager within five years", "Offering pathways to education, well-being support, equity, and opportunity so every partner can thrive", "Guaranteeing that every full-time partner earns a living wage above the local minimum", "Creating a mentorship program that pairs senior partners with new hires in every store"], answer: 1, feedback: "Bridging to a better future for partners means Starbucks invests in the whole person — through education benefits like the Starbucks College Achievement Plan, comprehensive healthcare, Bean Stock equity, mental health support, and career development. The goal is to leave every partner better off than when they joined." },
-  { q: "What is the 'Fourth Place' Starbucks has recognized beyond the Third Place?", opts: ["The Starbucks Reserve Roastery, a premium destination for coffee connoisseurs", "The digital or virtual space where customers connect with the Starbucks brand and community", "The drive-through experience, which now accounts for the majority of customer interactions", "The mobile app ecosystem that allows customers to order and pay without entering a store"], answer: 1, feedback: "While the Third Place is a physical space of belonging beyond home and work, Starbucks now recognizes a Fourth Place — the digital or virtual space. This includes the app, digital ordering, social media, and the Rewards program — places where the brand creates belonging and connection without requiring a physical visit." },
-  { q: "What is the Starbucks promise to its communities?", opts: ["To donate 1% of annual revenue to local community development organizations", "To contribute positively — through service, investment, and civic engagement in every neighborhood", "To hire exclusively from within the local community for each store's staffing needs", "To provide free meeting space for community organizations during off-peak hours"], answer: 1, feedback: "Starbucks' promise to communities is to contribute positively. This shows up through service projects, food donations, hiring programs, disaster relief contributions, and the store itself serving as a community gathering place. Starbucks sees its stores not as separate from neighborhoods, but as participants in them." },
-  { q: "What does Starbucks mean when it says it 'empowers its partners'?", opts: ["Giving baristas decision-making power over store layout and menu customization choices", "Partners are not just employees — they are brand ambassadors and storytellers empowered to be part of something bigger", "Granting partners the authority to override a customer's order if they feel it isn't of sufficient quality", "Allowing senior baristas to set their own schedules and shift preferences each week"], answer: 1, feedback: "Empowering partners means recognizing that each person wearing the green apron is more than a task-doer — they are a brand ambassador, a storyteller, and a community builder. Starbucks creates this empowerment through culture, benefits, autonomy, and a mission that is bigger than making coffee." },
-  { q: "What does 'performance through the lens of humanity' mean for Starbucks?", opts: ["Tracking employee performance metrics while considering personal life circumstances", "Achieving business results not in spite of human values, but because of them — care and excellence together", "Conducting quarterly performance reviews that assess interpersonal skills alongside technical abilities", "Using human-centered design to improve productivity and reduce partner burnout over time"], answer: 1, feedback: "'Performance through the lens of humanity' means that Starbucks believes its best business results come when partners lead with human values — care, connection, belonging, and joy. It's the rejection of the idea that compassion and performance are in tension; at Starbucks, they are the same thing." },
-  // YOUR ROLE (21-50)
-  { q: "What are the three elements of the Barista Approach?", opts: ["Be fast, be accurate, be friendly — the foundation of every shift", "Be Committed to Customers, Be Focused on Quality, and Be Dedicated to Each Other", "Greet, serve, and thank — the three-step Starbucks service sequence", "Connect, craft, and clean — the barista's daily priority framework"], answer: 1, feedback: "The Barista Approach has three elements: Be Committed to Customers (create a unique personalized experience), Be Focused on Quality (serve the highest quality beverage every time), and Be Dedicated to Each Other (support your team and recognize strengths). All three must be present in every shift." },
-  { q: "What happens during the 'Prepare' step of the Barista Pattern?", opts: ["Checking stock levels and completing the opening checklist before the first customer arrives", "Checking in with yourself (dress code, handwashing) and your team (position, goals, store news) before the shift begins", "Preparing all milk pitchers and espresso equipment for peak-hour volume", "Reviewing that day's promotional offers and informing customers of current specials"], answer: 1, feedback: "The Prepare step is about readiness — for yourself and your team. Are you in dress code? Hands washed? Do you know your position and today's goals? What new store information has been shared? Preparation prevents confusion and sets the tone for the entire shift." },
-  { q: "What question should a barista ask themselves during the 'Transition' step of the Barista Pattern?", opts: ["Did I complete all cycle tasks assigned to me during today's shift?", "How did I create the Starbucks Experience today, and what will I do differently next time?", "Did I meet the store's sales targets and beverage quality benchmarks?", "Are all stations clean, stocked, and ready for the incoming shift partners?"], answer: 1, feedback: "During Transition, the barista should ask: 'How did I create the Starbucks Experience today?' and 'What will I do differently on my next shift?' This moment of reflection transforms a job into a craft — building intentional growth rather than just clocking in and out." },
-  { q: "What are the three Star Skills that every great barista must develop?", opts: ["Speed, accuracy, and beverage knowledge — the operational core of barista excellence", "Maintain and enhance self-esteem, listen and acknowledge, and ask and provide help", "Greet warmly, serve quickly, and thank sincerely — the Starbucks service triangle", "Prepare the bar, craft the beverage, and connect with the customer at handoff"], answer: 1, feedback: "The three Star Skills are: 1) Maintain and enhance self-esteem — uplift partners and customers with dignity. 2) Listen and acknowledge — actively hear and show understanding. 3) Ask and provide help — proactively offer assistance without waiting to be asked. These are the interpersonal foundation of every barista's role." },
-  { q: "What does 'Maintain Customer Focus' mean as a deployment principle?", opts: ["Keeping the point-of-sale screen visible to the customer throughout the transaction", "Every decision made during a shift should prioritize the customer experience above all else", "Making sure at least one barista is positioned at the front counter at all times", "Directing all partner communication through headsets so the floor remains uninterrupted"], answer: 1, feedback: "Maintaining customer focus means that when things get complicated or busy, the guiding question is always: how does this affect our customers? All deployment decisions — positioning, task prioritization, break scheduling — should flow from this principle." },
-  { q: "Why is 'Clarify Roles' an important deployment principle at Starbucks?", opts: ["Because health regulations require all food-handling positions to be formally documented", "Because unclear roles lead to confusion, service gaps, and customer frustration — clarity creates smooth shifts", "Because the drive-through position requires specific certification before a partner can be assigned", "Because labor law requires that each partner's duties be defined in writing before each shift"], answer: 1, feedback: "Every partner should know exactly what position they are working before the shift begins. Unclear roles lead to confusion, gaps in service, and customer frustration. When roles are clear, handoffs are smooth, stations are covered, and every partner can focus on doing their job well." },
-  { q: "What does the 'Reduce Motion' deployment principle mean in practice?", opts: ["Asking customers to use the app to minimize counter interactions and unnecessary movement", "Organizing the workspace so partners don't take extra steps — less motion means faster service and less fatigue", "Limiting barista movement by assigning fixed positions throughout the entire shift", "Removing non-essential items from behind the counter to create a cleaner visual workspace"], answer: 1, feedback: "Reduce Motion means organizing the workspace so you don't have to take extra steps to get what you need. Efficient positioning saves energy and time. Less motion means faster service and less fatigue, especially during long or busy shifts. It's about working smarter, not harder." },
-  { q: "What is the purpose of the 'Stay Balanced' deployment principle?", opts: ["Ensuring partners take regular breaks to maintain physical and mental health during shifts", "Keeping workload distributed evenly among all partners so no one is overwhelmed while others are idle", "Maintaining an even ratio of baristas to cashiers regardless of traffic volume", "Rotating positions every 30 minutes to prevent repetitive strain injuries at the espresso bar"], answer: 1, feedback: "Stay Balanced means distributing workload evenly. An unbalanced shift leaves some partners overwhelmed and others idle — both reduce quality and morale. When everyone carries their fair share, the team runs more smoothly and energy stays high throughout the shift." },
-  { q: "What does 'Work in Routine' mean as a Starbucks deployment principle?", opts: ["Doing the same tasks in the same order every day to satisfy health and safety regulations", "Routines ensure every task is completed the same way every time — creating consistency and reducing inefficiency", "Using the same greeting script for every customer to maintain a uniform Starbucks experience", "Following a documented cleaning schedule posted in the back office to maintain store hygiene"], answer: 1, feedback: "Working in routine means completing tasks the same way every time — from brewing coffee to steaming milk to stocking supplies. Routines create consistency, reduce errors, make responsibilities easier to fulfill, and balance workload across the team. They are the backbone of operational excellence." },
-  { q: "What does 'Reduce Waiting' mean as a deployment principle at Starbucks?", opts: ["Shortening the menu to reduce the time customers spend deciding what to order", "Minimizing waiting time for both customers and between task steps by anticipating what's needed next", "Scheduling more partners during peak hours to ensure the line never exceeds five people", "Using digital boards to let customers know estimated wait times before they order"], answer: 1, feedback: "Reduce Waiting means minimizing wait time for customers and between task steps. Anticipate the next step before it's needed, keep stations stocked and ready, and stay in routine so the flow never breaks. A customer who waits too long loses connection with the experience." },
-  { q: "What are the three positions that make up the Starbucks customer flow?", opts: ["Cashier, barista, and food runner — covering all transaction and production needs", "Point of Sale (POS), Support, and Espresso Bar — the three core operational positions", "Front of house, back of house, and expeditor — based on traditional restaurant deployment models", "Order taker, drink maker, and customer greeter — the three roles present during every shift"], answer: 1, feedback: "The three core positions are: Point of Sale (POS) — connects with customers, takes orders, and handles payment; Support — handles restocking, food, and customer flow; Espresso Bar — crafts all beverages. Each position has specific routines and responsibilities that keep the store running smoothly." },
-  { q: "What is the POS partner's primary responsibility during their position?", opts: ["Making all hot espresso drinks and calling out beverage names at the handoff counter", "Creating the first and strongest customer connection, taking accurate orders, and setting up production", "Managing stock levels in the refrigerator and restocking the pastry case throughout the shift", "Operating the drive-through speaker system and coordinating mobile order pickups"], answer: 1, feedback: "The POS partner is responsible for the first human connection — greeting the customer, learning their name and order, entering it accurately, and setting up production. A strong POS partner establishes the tone of the entire customer experience before a single drink is made." },
-  { q: "What is the Support partner's primary function during a shift?", opts: ["Crafting all cold beverages and blended drinks while the espresso bar handles hot drinks", "Handling cycle tasks like restocking, food prep, customer flow support, and keeping the store clean and ready", "Operating the drive-through window and coordinating with the espresso bar on drink timing", "Monitoring beverage quality by tasting completed drinks before they are handed to customers"], answer: 1, feedback: "The Support partner keeps the store operational and clean — restocking supplies, managing the food case, cleaning the lobby, emptying trash, supporting customer flow, and completing cycle tasks. Without strong support, the POS and espresso bar partners cannot do their jobs effectively." },
-  { q: "What is the Espresso Bar partner primarily responsible for?", opts: ["Connecting with every customer who walks in and suggesting seasonal beverage options", "Crafting all beverages to Starbucks quality standards — from espresso shots to milk steaming to final assembly", "Managing inventory levels for all espresso bar ingredients and flagging low stock to the manager", "Ensuring all health and safety protocols are followed during food and beverage preparation"], answer: 1, feedback: "The Espresso Bar partner's job is to craft every beverage to the highest quality standard — from pulling espresso shots and steaming milk to assembling the final beverage and calling the drink with the customer's name. Quality, speed, and connection are all part of the role." },
-  { q: "What is a 'Cycle Task' in the Support position context?", opts: ["A task completed at the start and end of each shift as part of opening and closing procedures", "A regularly recurring task like restocking food, emptying trash, spot cleaning floors, or cleaning restrooms", "A task that cycles between all partners on rotation to ensure everyone shares in cleaning duties", "A documented checklist reviewed during each shift handoff between departing and arriving partners"], answer: 1, feedback: "Cycle Tasks are recurring tasks completed throughout the shift on a rotating basis — restocking the food case, emptying trash, spot cleaning floors, cleaning glass panels, and cleaning restrooms. They keep the store consistently clean and ready throughout the day, not just at opening and close." },
-  // CUSTOMER SERVICE (51-90)
-  { q: "What is the first step of the Starbucks Customer Service Commitment?", opts: ["Asking the customer's name and writing it on the cup before any other interaction", "Smiling and making genuine eye contact — the first signal that says 'I see you and I'm glad you're here'", "Offering the customer a sample of the seasonal featured beverage or food item", "Thanking the customer for choosing Starbucks and acknowledging their loyalty"], answer: 1, feedback: "The Customer Service Commitment begins with a smile and genuine eye contact. This is the first non-verbal signal that communicates: 'I see you, and I'm glad you're here.' A genuine smile is the foundation of every interaction — before a word is spoken, the tone is set." },
-  { q: "What is the L.A.T.T.E. model used for at Starbucks?", opts: ["A framework for recommending the best espresso-based beverage to new customers", "A five-step service recovery model for handling customer complaints and making things right", "A quality control checklist for ensuring every latte meets Starbucks espresso standards", "A training framework used to introduce new baristas to the espresso bar routine"], answer: 1, feedback: "L.A.T.T.E. stands for Listen, Apologize, Take Action, Thank, and Explain — a service recovery model for when something goes wrong with a customer's experience. The goal is to make the customer feel heard and valued, and to recover the experience quickly and genuinely." },
-  { q: "What does the 'L' in L.A.T.T.E. stand for, and why is it the most critical step?", opts: ["Loyalty — acknowledging that the customer has chosen Starbucks over competitors", "Listen — allowing the customer to fully express themselves without interruption before offering any solution", "Learning — using every complaint as an opportunity to identify training gaps in the store", "Legitimize — confirming that the customer's complaint is valid before taking corrective action"], answer: 1, feedback: "The L stands for Listen — without interrupting the customer. Let them fully express their emotions. Do not jump to solutions before they have finished speaking; they need to feel heard first. This is the most important step and the one baristas most commonly skip. Feeling heard is often more important than the fix itself." },
-  { q: "What should a barista never do when apologizing in the L.A.T.T.E. model?", opts: ["Apologize more than once, as repetitive apologies can feel insincere and hollow", "Make excuses, place blame, or justify why the problem occurred — the apology must be unconditional", "Apologize on behalf of the whole store rather than taking personal responsibility", "Offer a replacement beverage before the apology is complete, as this can feel dismissive"], answer: 1, feedback: "The A (Apologize) step must be unconditional — never make excuses or place blame. 'I'm sorry that happened' is always appropriate. 'That wasn't my fault' is never appropriate. An unconditional apology acknowledges the customer's experience without assigning guilt to any party." },
-  { q: "Why does L.A.T.T.E. include a step to 'Thank' the customer after a complaint?", opts: ["To make the customer feel obligated to return despite the poor experience they received", "Because the customer gave us an opportunity to make things right — they could have left without saying anything", "To soften the interaction and avoid negative online reviews of the store after the complaint", "Because thanking the customer is required as part of Starbucks standard service recovery documentation"], answer: 1, feedback: "Thanking the customer reframes the complaint as a gift. They could have left without saying anything and never returned. Instead, they trusted us enough to speak up. That deserves genuine gratitude — it is an opportunity to rebuild the relationship and often leaves customers more loyal than before." },
-  { q: "What are the three components of 'Passion for Service' at Starbucks?", opts: ["Speed, accuracy, and consistency — the operational triangle of service excellence", "Awareness (caring to notice), Empathy (emotional connection), and Action (serving others)", "Greeting, serving, and thanking — the core sequence of every customer interaction", "Knowledge, hospitality, and efficiency — the three pillars of the Starbucks Experience"], answer: 1, feedback: "Passion for Service is built on three elements: Awareness — noticing customers, partners, and the environment with intention. Empathy — genuinely understanding and feeling what the customer feels. Action — taking initiative to serve without waiting to be asked. All three must be present; awareness and empathy without action accomplish nothing." },
-  { q: "Why is 'using the customer's name' such a powerful service tool?", opts: ["Because it is required by the Starbucks operational procedure for all in-store drink orders", "Because using a name transforms a transaction into a personal connection — the customer is not just order #47", "Because it helps baristas keep track of multiple mobile orders in a busy drive-through environment", "Because Starbucks Rewards accounts link customer names to their preferred drink orders automatically"], answer: 1, feedback: "Using a customer's name transforms the interaction from a transaction into a connection. Remembering their usual drink tells them they matter as a human being. This small act — a name written on a cup or spoken at handoff — is one of the most powerful tools in creating the Starbucks Experience." },
-  { q: "What does 'Make Every Moment Right' mean in the Starbucks service commitment?", opts: ["Correcting any beverage error immediately by remaking the drink at no charge to the customer", "Noticing what each customer actually needs — sometimes speed, sometimes warmth — and responding accordingly", "Ensuring every step of the service process is completed exactly according to Starbucks standards", "Guaranteeing that no customer waits more than three minutes from order to receiving their drink"], answer: 1, feedback: "Make Every Moment Right is about awareness and empathy in action. Not every customer needs the same thing — some need speed, some need warmth, some need to be recognized. A barista who truly makes every moment right reads the customer and responds to their actual need, not a script." },
-  { q: "What does 'Action — Serving Others' require that awareness and empathy alone cannot provide?", opts: ["Technical training in beverage preparation and food safety handling protocols", "The initiative to actually do something — see it, feel it, fix it — without waiting to be asked", "Management approval before taking any steps to resolve a customer complaint or error", "A documented service recovery plan that outlines the exact steps for each type of complaint"], answer: 1, feedback: "Awareness and empathy are worthless without action. Acting in the service of others means taking initiative — not waiting to be asked, not passing the problem to someone else, not making excuses. See it, feel it, fix it. Action is what converts good intentions into the actual Starbucks Experience." },
-  { q: "A customer leaves without saying anything but looks disappointed. What should a Starbucks partner do?", opts: ["Note the incident in the shift log for the manager to follow up on if the customer returns", "Use awareness and empathy to proactively notice the issue and take action to address the customer before they leave", "Wait to see if the customer submits feedback through the app or calls the store later", "Check with the team to see if anyone else noticed the issue before deciding whether to intervene"], answer: 1, feedback: "Awareness means noticing what's happening even when customers don't say anything. If a customer looks disappointed, a partner with genuine awareness and empathy will proactively reach out to make it right before they leave. Waiting for a customer to complain is already too late — the moment has been lost." },
-  // ESPRESSO BAR (91-140)
-  { q: "What are the four steps of the Espresso Bar Routine?", opts: ["Prepare, pull, steam, and serve — the four actions behind every espresso-based beverage", "Set Up, Connect and Take Order, Craft, and Finish and Connect — the four phases of the espresso bar cycle", "Grind, tamp, extract, and pour — the four elements of proper espresso production", "Order, build, quality-check, and call — the four moments in crafting a completed drink"], answer: 1, feedback: "The Espresso Bar Routine has four phases: Set Up (prepare your station), Connect and Take Order (connect with the customer and clarify their order), Craft (make the beverage to Starbucks standards), and Finish and Connect (call the drink, make eye contact, thank the customer, ensure they have everything they need)." },
-  { q: "What temperature range is considered standard for steaming milk at Starbucks?", opts: ["120°F–140°F (49°C–60°C) — warm enough to blend without scalding the foam", "150°F–170°F (66°C–77°C) — the ideal range for creating proper microfoam texture", "175°F–195°F (79°C–91°C) — hot enough to meet health codes for safe dairy service", "130°F–150°F (54°C–66°C) — the range used for all temperature-sensitive modifications"], answer: 1, feedback: "Standard milk temperature at Starbucks is 150°F–170°F (66°C–77°C). The auto-steam function is calibrated to this range. Custom temperature requests — Kids (130°F), Warm (140°F) — require a calibrated thermometer. Milk should never be served above 195°F." },
-  { q: "Why must milk NEVER be re-steamed?", opts: ["It causes the steam wand to overheat and can damage the espresso machine over time", "Re-steaming destroys protein structure, eliminates microfoam quality, degrades flavor, and creates food safety risks", "It violates Starbucks standard operating procedures and can result in a partner write-up", "The milk will separate into water and fat components, making it impossible to create proper latte art"], answer: 1, feedback: "Re-steaming is a serious quality and food safety issue. The first steaming aerates milk and creates microfoam by denaturing proteins. A second steaming destroys what remains, eliminates foam quality, creates a scalded flat flavor, and introduces temperature cycling risks. Always steam a fresh pitcher for each beverage." },
-  { q: "What milk type is used as the Starbucks default for most beverages in the CAP region?", opts: ["Nonfat milk — for the lightest possible calorie count across all standard beverages", "Whole milk — for the richest microfoam and most consistent steaming results", "2% milk — the middle-ground option that balances texture and calorie count", "Oat milk — due to growing demand for plant-based options across all customer demographics"], answer: 1, feedback: "Whole milk is the default in the CAP (Canada, Asia Pacific) region because it produces the richest microfoam and the most consistent steaming results due to its higher fat content. When a customer doesn't specify, whole milk is used. Other regions may use 2% as the default — always know your local standard." },
-  { q: "What are the standard Starbucks milk options available in store?", opts: ["Whole, nonfat, oat, almond, and coconut — the five plant and dairy staples", "Whole, 2%, nonfat, half-and-half, heavy cream, soy, and coconut — the full standard range", "Skim, 1%, 2%, whole, and cream — mirroring standard North American grocery options", "Whole, oat, almond, soy, and nonfat — covering both dairy and the top plant-based alternatives"], answer: 1, feedback: "Standard milk options include: Whole, 2%, Nonfat, Half-and-Half, Heavy Cream, Soy, and Coconut. Designated pitchers should be used for each milk type to prevent allergen cross-contamination — especially important for customers with dairy allergies who request plant-based alternatives." },
-  { q: "What does 'Half Decaf' mean on a Starbucks beverage order?", opts: ["A beverage made with half the standard number of espresso shots, all of which are decaffeinated", "Exactly half of the espresso shots are regular and half are decaffeinated — a 50/50 blend", "A beverage with 50% less caffeine than standard due to a lighter extraction process", "Decaffeinated espresso combined with half-and-half instead of whole or nonfat milk"], answer: 1, feedback: "Half Decaf means half the shots are regular and half are decaffeinated. For a Doppio (2 shots), that's 1 regular and 1 decaf. It's popular for customers who want to moderate caffeine without eliminating it entirely. Always confirm the shot count with the customer to ensure accuracy." },
-  { q: "What is 'Finish and Connect' in the espresso bar routine, and why does it matter?", opts: ["The final quality check where the barista verifies each component of the beverage before calling it", "The moment of genuine human connection at handoff — calling the drink, making eye contact, smiling, and ensuring the customer has everything they need", "The step where the barista sanitizes the steam wand and wipes down the espresso bar after completing a beverage", "The process of logging the completed drink in the POS system and moving to the next order in the queue"], answer: 1, feedback: "Finish and Connect is not just handing over a cup — it's the most memorable touchpoint in the experience. Call the drink and the customer's name, make eye contact, smile, thank them, and make sure they have a straw, sleeve, and carrier if needed. This last moment is what customers remember most." },
-  { q: "What does a Cappuccino have that distinguishes it from a Latte?", opts: ["More espresso shots — a standard cappuccino uses three shots versus a latte's two", "Less steamed milk and a deep, substantial layer of dry foam — the opposite of a latte's milk-heavy profile", "A different espresso blend — cappuccinos use a darker roast than lattes in the Starbucks system", "A flavored syrup base — standard cappuccinos include vanilla by default while lattes are unflavored"], answer: 1, feedback: "A Cappuccino has less steamed milk and a deep, substantial layer of foam — the espresso character comes through more clearly and the texture is drier and lighter. A Latte has lots of steamed milk and only a thin layer of foam — smooth, creamy, and milk-forward. Same base ingredients; completely different experience." },
-  { q: "What is the correct size for Cold Foam milk volume and which milk type is used?", opts: ["100 ml of whole milk — for maximum richness and a thick, creamy cold foam texture", "150 ml of nonfat milk — the protein structure creates a denser, more stable foam without fat weighing it down", "200 ml of 2% milk — the middle option that creates foam with body but still pours cleanly", "120 ml of oat milk — for a plant-based cold foam that accommodates dairy-free customers"], answer: 1, feedback: "Cold Foam uses 150 ml of nonfat milk. Nonfat milk's protein structure — without the fat that weighs down foam — creates a denser, more stable cold foam. The blender uses button 4 to achieve the right airy, luscious texture. Approximately ½ cm of cold foam is placed on top of the finished cold beverage." },
-  { q: "What is the 'Short' size at Starbucks, and what makes it unique?", opts: ["A 10 oz cup available only for cold beverages — positioned between Tall and the standard small", "An 8 oz cup available only as a hot beverage — the smallest size in the Starbucks lineup", "A 6 oz espresso-only format for customers who want nothing but pure espresso in the cup", "A 12 oz cup synonymous with Tall in some international markets where sizing differs"], answer: 1, feedback: "Short (8 oz) is only available as a hot beverage — it is not available in cold. Hot sizes are Short (8 oz), Tall (12 oz), Grande (16 oz), and Hot Venti (20 oz). Cold sizes are Tall, Grande, and Cold Venti — all at slightly different volumes. Short is the original Starbucks size, predating the Tall." },
-  // TEA & BEVERAGES (141-165)
-  { q: "What is 'oxidation' in the context of tea processing, and why does it matter?", opts: ["A preservation technique that prevents tea leaves from spoiling after harvest", "When picked tea leaves are exposed to oxygen, transforming their color, aroma, and flavor — determining the tea type", "The heating process that locks in flavor compounds before the drying and packaging stage", "A quality test where tea leaves are exposed to air to check for off-flavors before shipping"], answer: 1, feedback: "Oxidation occurs when picked tea leaves are exposed to oxygen — enzymes in the leaves react to transform their chemistry. No oxidation = green/white tea (delicate, grassy). Partial oxidation = oolong (complex, floral). Full oxidation = black tea (robust, bold). Herbal teas skip this entirely as they aren't made from Camellia sinensis leaves." },
-  { q: "How long should black tea brew at Starbucks, and at what temperature?", opts: ["3 minutes at 175°F (79°C) — a shorter steep to preserve the tea's natural sweetness", "5 minutes at 195°F (90°C) — long enough for the robust, fully oxidized leaves to fully develop", "7 minutes at 195°F (90°C) — the longest steep time reserved for the most robust varieties", "2 minutes at 205°F (96°C) — a short, high-temperature steep to maximize caffeine extraction"], answer: 1, feedback: "Black tea brews for 5 minutes at 195°F (90°C). The full time guide: White & Green = 3 minutes · Black & Herbal = 5 minutes · Oolong = 7 minutes. Black tea is fully oxidized and robust enough for a 5-minute steep — unlike delicate green or white teas that become bitter quickly at high temperatures." },
-  { q: "What is the correct order for building a Blended Beverage at Starbucks?", opts: ["Ice first, then milk, then syrup, then coffee — building layers from lightest to heaviest", "Pump coffee → Pour milk → Pour cup content → Add flavor and ice → Pump base → Blend → Finish and connect → Clean up", "Blend coffee with ice first, then add milk and syrups after blending for consistency", "Add all ingredients simultaneously for efficiency, then blend and finish with toppings"], answer: 1, feedback: "The Blended Beverage Routine is: Pump coffee → Pour milk → Pour cup content → Add flavor and ice → Pump base → Blend → Finish and connect → Clean up. Following this sequence every time ensures consistent flavor and texture — and prevents common mistakes like forgetting the base or adding ingredients out of order." },
-  { q: "What are the four tasting characteristics shared by both tea and coffee at Starbucks?", opts: ["Bitterness, sweetness, acidity, and body — the four dimensions of any brewed beverage", "Aroma, Appearance, Body, and Flavor — the framework for evaluating any brewed beverage", "Origin, roast, processing method, and brewing style — the four identity markers of specialty drinks", "Color, clarity, texture, and taste — the four observable qualities assessed during quality control"], answer: 1, feedback: "Both tea and coffee are evaluated using: Aroma (how it smells), Appearance (color and clarity of the liquor), Body (the weight or mouthfeel — full-bodied vs. delicate), and Flavor (how it actually tastes). Using this consistent framework develops sensory vocabulary and helps partners describe beverages to curious customers." },
-  { q: "What is 'body' when describing a tea or coffee?", opts: ["The amount of caffeine present in the beverage, which determines how stimulating it feels", "The weight or mouthfeel of the liquid — whether it feels full and substantial or light and delicate", "The visual appearance of the brewed beverage, including color depth and surface clarity", "The overall quality score assigned to a tea or coffee based on its origin and processing"], answer: 1, feedback: "Body in tea or coffee refers to its weight or mouthfeel — does the liquid feel full-bodied and substantial, like whole milk, or delicate and light, like water? A well-bodied beverage coats the palate; a light-bodied one passes through cleanly. Body is one of the four sensory characteristics in Starbucks' evaluation framework." },
-  // STORE OPERATIONS (166-200)
-  { q: "What is the 'Approved Product List (APL)' and what information does it contain?", opts: ["A store-specific list of products approved for promotion by the district manager each quarter", "A comprehensive resource covering food shelf life, thaw time, nutritional info, allergens, dietary categories, and serving requirements", "The master inventory document that tracks all product orders and delivery schedules for a store", "A list of products that have passed Starbucks quality review and are approved for nationwide rollout"], answer: 1, feedback: "The APL is the complete reference for all food-related information: shelf life, thaw time, nutritional information, dietary categories (vegetarian/vegan), pairings, special preparation requirements, allergen information, and more. Whenever a barista has a question about a food item, the APL is the authoritative source." },
-  { q: "What is the key difference between 'vegetarian' and 'vegan' food options at Starbucks?", opts: ["Vegetarian and vegan are interchangeable terms used differently in different regions", "Vegetarian excludes meat, poultry, and fish but may include dairy and eggs; vegan excludes all animal-origin ingredients", "Vegan excludes only red meat; vegetarian excludes all animal products including dairy and eggs", "Vegetarian items can contain honey; vegan items cannot contain honey or any other bee products"], answer: 1, feedback: "Vegetarian means no meat, poultry, or fish — but dairy and eggs may be present. Vegan is stricter: no animal-origin ingredients at all, including milk, eggs, honey, and gelatin. Knowing these distinctions precisely is essential for accurately answering customer dietary questions and making appropriate recommendations." },
-  { q: "A customer requests 'warm' temperature on their latte. What temperature should the milk be steamed to?", opts: ["130°F (54°C) — the Kids temperature for the most heat-sensitive customers", "140°F (60°C) — the Warm setting for customers who prefer a gentler, less hot beverage", "150°F (66°C) — the low end of the standard temperature range used for adult beverages", "160°F (71°C) — a moderately warm temperature between standard and extra-hot"], answer: 1, feedback: "Warm temperature is 140°F (60°C). The full temperature guide: Kids = 130°F · Warm = 140°F · Standard (adult) = 150°F–170°F · Extra Hot = up to 180°F · Never serve above 195°F. Use a calibrated steaming thermometer for all custom temperature requests, as the auto-steam function only handles standard temperatures." },
-  { q: "What are the hot beverage sizes available at Starbucks, and which is only available hot?", opts: ["Demi, Short, Tall, and Grande — with Demi being the espresso-only hot size", "Short (8 oz), Tall (12 oz), Grande (16 oz), and Venti (20 oz) — with Short only available hot", "Small, Medium, Large, and Extra-Large — the four universal sizes across all beverages", "Tall, Grande, Venti, and Trenta — with Trenta only available for hot beverages over 20 oz"], answer: 1, feedback: "Hot sizes are Short (8 oz), Tall (12 oz), Grande (16 oz), and Hot Venti (20 oz). Short is only available as a hot beverage — it is not a cold option. Cold sizes are Tall, Grande, and Cold Venti — the largest cold beverages hold more volume than their hot counterparts of the same name." },
-  { q: "What is a key reason why allergen awareness matters when steaming different milk types?", opts: ["Different milk types have different fat contents that affect steaming times and machine calibration", "Cross-contamination between dairy and plant-based milks can cause serious allergic reactions in vulnerable customers", "Mixing milk types in the same pitcher creates an inconsistent foam texture that affects drink quality", "Health regulations in most regions require separate equipment for each milk type used in food service"], answer: 1, feedback: "Allergen cross-contamination is a serious concern — a customer with a dairy allergy ordering oat milk could experience a reaction if their beverage was made in a pitcher previously used for whole milk. Designated pitchers for each milk type are a safety requirement, not just a quality preference." },
-  { q: "Why is it important that a barista knows both food AND beverage pairings?", opts: ["Because pairing recommendations directly increase transaction size and contribute to sales targets", "Because making thoughtful pairing suggestions is part of creating the Starbucks Experience and demonstrating coffee knowledge", "Because Starbucks' operational standards require pairings to be offered on every transaction", "Because food pairings are evaluated during district manager visits as part of store performance scores"], answer: 1, feedback: "Pairing knowledge is part of the expertise that makes the Starbucks Experience feel personal and knowledgeable. Suggesting that a bold Pike Place Roast pairs beautifully with a butter croissant, or that a citrusy tea goes well with lemon loaf, elevates the interaction from order-taking to genuine hospitality." },
-  { q: "What is the temperature that Starbucks considers 'Kids' temperature for beverages?", opts: ["120°F (49°C) — cool enough that a young child can drink it without risk of burning", "130°F (54°C) — warm but not hot, specifically calibrated for young or heat-sensitive customers", "140°F (60°C) — the same as the Warm temperature but labeled differently for clarity", "110°F (43°C) — below body temperature, ensuring even the youngest children can drink safely"], answer: 1, feedback: "Kids temperature is 130°F (54°C) — warm enough to taste like a hot beverage but cool enough that a child can drink it without burning their mouth. When a parent requests 'kids temp,' always use a calibrated thermometer to verify accuracy, as the auto-steam function targets the adult standard range." },
-  { q: "What is the correct milk default for the CAP region's standard hot espresso beverages?", opts: ["2% milk — used in North America as a balanced option between whole and nonfat", "Whole milk — producing the richest microfoam and most consistent steaming texture", "Nonfat milk — reflecting growing consumer preference for lower-calorie dairy options", "Oat milk — aligning with the region's strong preference for plant-based beverage options"], answer: 1, feedback: "Whole milk is the default in the CAP (Canada, Asia Pacific) region. Its higher fat content produces the richest microfoam and the most consistent texture when steamed. North American stores in the US region typically default to 2% milk. Partners should always know the default for their specific market." },
-  { q: "How does a barista verify that a beverage they crafted meets Starbucks quality standards?", opts: ["By submitting the beverage details to the quality tracking system before calling the customer's name", "By applying the Four Fundamentals — Right Drink, Right Size, Right Temperature, and Right Customization — at every step", "By tasting every completed beverage before handing it to the customer for final approval", "By checking the customer's mobile order receipt against the completed beverage during handoff"], answer: 1, feedback: "Quality verification uses the Four Fundamentals: Right Drink (correct recipe), Right Size (correct cup and volume), Right Temperature (standard or custom), and Right Customization (every modification correctly applied). Internalizing these four checkpoints makes quality assurance a natural part of crafting, not a separate step." },
-];
-
-// ─── MODULE 1: BARISTA TRAINER (200 questions) ────────────────────────────────
-const mod1Pool = [
-  { q: "What is the primary role of a Barista Trainer at Starbucks?", opts: ["To manage scheduling and deployment for new partners during their first 90 days", "To develop partner knowledge, skills, and confidence through intentional coaching and teaching", "To conduct formal performance reviews and determine whether a partner passes their probation period", "To demonstrate beverage recipes and ensure the new partner can replicate them within their first week"], answer: 1, feedback: "A Barista Trainer's primary role is development — building knowledge, skills, and confidence in new partners through intentional, supportive coaching. The goal is not just to produce competent baristas, but to ignite curiosity and build lasting capability so partners can grow beyond the basics." },
-  { q: "What does the Starbucks 'Tell, Show, Do, Review' training model involve?", opts: ["A sequential process where the trainer explains a skill, demonstrates it, has the learner attempt it, then provides feedback", "A documentation framework where trainers write, observe, score, and file training records for each partner", "A four-stage curriculum covering product knowledge, customer service, operations, and safety in sequence", "A quality control model where the trainer monitors, samples, documents, and re-trains as needed"], answer: 0, feedback: "Tell, Show, Do, Review is Starbucks' core training sequence: Tell the learner what to do and why (explain the purpose), Show how it's done (demonstrate correctly), Do let them practice it (hands-on experience), and Review with feedback (reinforce what went well and coach what needs improvement). This cycle repeats until mastery is reached." },
-  { q: "What does 'Tell' mean in the Tell, Show, Do, Review model?", opts: ["Verbally reciting the recipe or procedure from memory without referencing training materials", "Explaining what the learner will do AND why it matters — connecting the task to the larger purpose", "Telling the learner the result that is expected before they begin their practice attempt", "Informing the manager when a new partner is ready to work independently on a given skill"], answer: 1, feedback: "Tell means explaining both the what and the why. A learner who understands why milk should never be re-steamed is far less likely to make that mistake than one who was only told 'don't do it.' Purpose creates meaning, and meaning creates retention." },
-  { q: "What is the purpose of the 'Review' step in the training model?", opts: ["To formally sign off on the partner's training completion and update their skills record", "To provide specific feedback — reinforcing what went well and identifying what needs improvement", "To review all training materials together as a group before moving to the next skill area", "To measure how long it took the learner to complete the task against Starbucks time benchmarks"], answer: 1, feedback: "Review is about closing the learning loop — specific, timely feedback that reinforces strengths and honestly addresses areas for growth. Vague feedback ('good job') teaches nothing. Specific feedback ('your steam wand angle created great microfoam — just watch your temperature next time') builds real skill." },
-  { q: "What are the three main learning styles that a Barista Trainer should recognize and accommodate?", opts: ["Fast, moderate, and slow — adapting training pace to individual learning speed", "Visual (seeing), Auditory (hearing), and Kinesthetic (doing) — different ways people best absorb information", "Formal, informal, and experiential — three modes of workplace learning at Starbucks", "Individual, group, and self-directed — three structures for delivering training content effectively"], answer: 1, feedback: "The three main learning styles are: Visual (learners absorb information best when they see it — demonstrations, diagrams), Auditory (learners absorb best when they hear it — explanations, verbal walkthroughs), and Kinesthetic (learners absorb best when they do it — hands-on practice). Great trainers use all three in every session." },
-  { q: "Why is it important for a Barista Trainer to adapt to different learning styles?", opts: ["Because Starbucks training regulations require documentation that all three styles were addressed", "Because people genuinely process information differently — a one-size-fits-all approach leaves some learners behind", "Because training sessions are time-limited and varying the approach helps maintain partner engagement", "Because different positions in the store require different learning styles to master their specific skills"], answer: 1, feedback: "Adapting to learning styles is about inclusivity and effectiveness. A trainer who only explains verbally will lose kinesthetic learners who need to try it themselves. A trainer who only demonstrates will frustrate auditory learners who need to hear the reasoning. Reaching every partner means teaching in the way they learn best." },
-  { q: "What does effective feedback in a Starbucks training context look like?", opts: ["Pointing out every mistake immediately so the learner can correct their technique in real time", "Specific, timely, and balanced — acknowledging what went well before coaching what needs improvement", "Detailed written reports submitted to the store manager after each training session ends", "Comparison-based feedback that shows the learner how their performance matches top baristas"], answer: 1, feedback: "Effective feedback is specific (not vague), timely (given close to the observed behavior), and balanced (starts with strength before addressing development). 'Your espresso extraction time was spot on — let's work on maintaining that steam wand angle' is far more effective than 'that was pretty good but the foam was off.'" },
-  { q: "What is the risk of a Barista Trainer who only teaches by demonstration without allowing practice?", opts: ["The learner will pass their initial training assessment but fail to retain skills within two weeks", "Kinesthetic learners will not retain the skill — hands-on practice is essential to true learning and confidence", "The demonstration will not be representative of real peak-hour conditions the partner will face", "Other partners will feel excluded if one person is being trained one-on-one during a busy shift"], answer: 1, feedback: "Kinesthetic learners — who often make up a large portion of new partners — must physically do the task to internalize it. Watching a perfect demonstration and then being expected to perform it without hands-on practice is a setup for failure. 'Do' is not optional in Tell, Show, Do, Review." },
-  { q: "What is the purpose of setting clear expectations at the start of a training session?", opts: ["To meet compliance requirements for partner training documentation in the store system", "To give the learner a mental map of what they will do, what success looks like, and how they'll be supported", "To allow the trainer to assess the partner's starting knowledge level before beginning instruction", "To ensure the partner agrees to the training plan before any liability-related demonstrations occur"], answer: 1, feedback: "Clear expectations at the start of training create psychological safety and focus. When a learner knows what they're doing, what success looks like, and that they'll be supported throughout, anxiety drops and engagement rises. Starting with ambiguity is starting with a disadvantage." },
-  { q: "What is the difference between 'coaching' and 'correcting' in a Starbucks training context?", opts: ["Coaching is done during training shifts; correcting is done only during formal performance reviews", "Coaching builds capability through questions and guided discovery; correcting simply points out what was wrong", "Correcting is done by managers; coaching is exclusively the role of the Barista Trainer", "Coaching focuses on attitude and values; correcting focuses on technical skills and procedures"], answer: 1, feedback: "Coaching asks questions and guides the partner to discover the answer themselves — 'What do you think happened with the foam texture there?' This builds ownership and thinking skills. Correcting simply tells someone what they did wrong. Coaching creates growth; correcting creates dependency. Both have their place, but coaching builds better baristas." },
-  { q: "What should a Barista Trainer do if a new partner is consistently making the same mistake?", opts: ["Escalate the issue to the store manager to determine whether the partner is suitable for the role", "Revisit the Tell and Show steps — the learner may need the concept re-explained or re-demonstrated differently", "Assign the partner additional practice repetitions until they get the technique right through trial and error", "Document the error pattern and add a note to the partner's training file for future reference"], answer: 1, feedback: "Repeated errors usually indicate a gap in understanding, not a lack of effort. The trainer should return to Tell (re-explain the why) and Show (re-demonstrate, perhaps from a different angle or with more detail). Adjusting the teaching approach is always the trainer's responsibility before escalating the issue." },
-  { q: "What role does encouragement play in Starbucks barista training?", opts: ["It is a secondary concern — technical competence should always be the primary focus of training", "It is essential — partners who feel supported and recognized learn faster and develop more confidence", "Encouragement should be reserved for exceptional performance to maintain its motivational impact", "It is the manager's role — trainers should focus on skill delivery and leave motivation to leadership"], answer: 1, feedback: "Encouragement is not a 'soft' extra — it's a performance accelerator. Partners who feel genuinely supported, recognized for progress, and safe to make mistakes learn faster, retain more, and develop greater confidence. A trainer who only focuses on errors will create anxious, hesitant baristas who second-guess every decision." },
-  { q: "Why is timing important when giving feedback to a new barista partner?", opts: ["Because immediate feedback triggers a stress response that can impair learning in the moment", "Because feedback given close to the observed behavior is more specific, more memorable, and more actionable", "Because Starbucks feedback protocols require all coaching to happen at the end of the shift", "Because partners are better able to receive feedback after they have completed an entire training module"], answer: 1, feedback: "Timely feedback connects directly to the experience that just happened — the partner can immediately relate it to what they did and make a mental adjustment. Feedback delivered hours later loses specificity ('which pour-over did you mean?') and loses impact. The closer to the moment, the more effective the learning." },
-  { q: "What is the trainer's responsibility when a learner seems confused or overwhelmed?", opts: ["Reducing the number of tasks assigned per shift until the partner demonstrates readiness for more", "Slowing down, asking open questions, and adjusting the approach to meet the partner where they are", "Reassigning the partner to a simpler position until they have more experience and confidence", "Bringing in the store manager to assess whether the training plan needs to be modified formally"], answer: 1, feedback: "When a learner is confused or overwhelmed, the responsibility lies with the trainer — not the learner. Slowing down, checking for understanding through open questions ('what's unclear?'), and adjusting the approach are all part of responsive, effective training. The best trainers are flexible, not rigid." },
-  { q: "What does 'building on strengths' mean in a Starbucks coaching approach?", opts: ["Assigning partners to positions that already match their natural abilities rather than developing new skills", "Starting feedback with what the learner did well, then connecting development areas to those strengths", "Identifying the top-performing partners in the store and giving them additional responsibility and training hours", "Focusing exclusively on what a partner does well and avoiding any feedback that might feel discouraging"], answer: 1, feedback: "Building on strengths means using what the partner already does well as a foundation for growth. 'You have great customer connection energy at the POS — let's channel that same enthusiasm into your espresso bar handoffs.' This creates positive motivation and helps learners see growth as additive, not remedial." },
-  { q: "What is the role of open-ended questions in a training conversation?", opts: ["To assess whether the partner has memorized the correct answers to standard training topics", "To encourage the partner to think, reflect, and explain their understanding in their own words", "To identify gaps in training content that may need to be updated in the training materials", "To give the trainer a break from explaining and allow the learner to drive the conversation"], answer: 1, feedback: "Open-ended questions ('What do you think happens when you steam milk past 170°F?') encourage thinking and reflection. They reveal the depth of understanding, uncover misconceptions, and give the learner ownership of their own learning. Closed questions ('Did you understand?') only invite yes or no — neither tells you much." },
-  { q: "What is a common mistake new Barista Trainers make when observing a learner's practice?", opts: ["Observing from too far away to see the specific technique the learner is using", "Jumping in to correct or take over too quickly before the learner has had a chance to work through the task", "Providing feedback that is too detailed and technical for a brand-new partner to absorb", "Allowing other experienced baristas to give feedback during the training session simultaneously"], answer: 1, feedback: "The most common trainer mistake during the 'Do' phase is intervening too quickly. Partners need the space to try, make small errors, and work through the challenge — that's where real learning happens. Jumping in too fast robs them of the productive struggle that builds genuine confidence and retention." },
-  { q: "How should a Barista Trainer handle a partner who says 'I already know how to do this'?", opts: ["Accept the partner's assessment and move directly to the Review step without demonstration", "Acknowledge their confidence, invite them to demonstrate, and use observation to verify or build on their knowledge", "Defer to the partner and skip training on that topic to focus time on areas they are less familiar with", "Report the partner's attitude to the store manager as a potential coaching issue for leadership to address"], answer: 1, feedback: "Acknowledging confidence while verifying through observation is the right approach. Saying 'Great — show me' is a respectful, non-confrontational way to assess actual skill level. You may find the partner is genuinely proficient (skip or refine), or you may discover gaps that need addressing (without having created a defensive dynamic)." },
-  { q: "What does 'connecting training to purpose' mean in a Starbucks context?", opts: ["Linking every training task to the store's sales metrics to demonstrate business relevance", "Helping the learner understand how each skill they are developing connects to the customer experience and Starbucks mission", "Providing a written explanation of how each training module fits into the overall certification timeline", "Showing new partners how mastering their current role leads to promotion and career advancement"], answer: 1, feedback: "Connecting training to purpose means helping partners see the 'so what.' A barista who understands that perfect microfoam directly determines whether a customer gets a Starbucks Experience or just a warm drink will care more about technique. Purpose transforms a task into a craft." },
-  { q: "What is the ideal environment for a productive training session at Starbucks?", opts: ["During the busiest shift hours so the learner is exposed to real conditions immediately", "A supportive environment where the learner feels psychologically safe to try, make mistakes, and ask questions", "A one-on-one setting with no other partners present to avoid distraction during instruction", "A quiet back-of-house space where training can happen separately from the customer-facing floor"], answer: 1, feedback: "Psychological safety is the foundation of effective learning. If a learner fears embarrassment or judgment for making mistakes, they will hesitate to try, hide confusion, and ultimately fail to develop. The best training environments feel safe, encouraging, and normalized around iteration rather than perfection." },
-  { q: "What should a trainer do after a training session to reinforce learning?", opts: ["Submit a detailed report to the store manager documenting every skill practiced and the outcome", "Schedule a brief debrief with the partner — reviewing what went well, what to work on, and what's next", "Move immediately to the next module without review so momentum is maintained", "Assign the partner additional self-study reading materials to review on their own time at home"], answer: 1, feedback: "A debrief after each training session reinforces learning and creates intentionality. 'Today you nailed milk temperature — next shift let's focus on your steam wand angle and foam consistency.' This keeps the partner focused, motivated, and connected to their own progress over time." },
-  { q: "What is the benefit of using 'I' statements when giving developmental feedback?", opts: ["They make feedback feel more personal and emotionally connected to the partner's growth", "They describe what the trainer observed without making the learner feel judged or defensive", "They comply with Starbucks' formal HR communication policy for all partner feedback conversations", "They allow the trainer to express their own feelings about the partner's performance accurately"], answer: 1, feedback: "Using 'I' statements ('I noticed the steam wand was submerged too deeply — let's work on that angle') describes observation without attaching judgment or blame. This keeps feedback neutral and developmental rather than personal. It's less threatening than 'you did it wrong' and far more likely to be received and acted upon." },
-  { q: "What is meant by 'meeting the learner where they are' in training?", opts: ["Physically positioning yourself next to the learner at their station during the demonstration phase", "Assessing the partner's current knowledge and skill level before deciding where to begin training", "Adapting the complexity and pace of instruction to match the learner's existing comfort and capability", "Choosing training topics based on the tasks the partner will be assigned during their first week"], answer: 2, feedback: "Meeting the learner where they are means first understanding what they already know and can do, then building from that foundation. Starting too advanced creates overwhelm; starting too basic creates disengagement. The best trainers assess first and adjust constantly — training is never a fixed-speed monologue." },
-  { q: "Why is consistency important in how a Barista Trainer teaches procedures?", opts: ["So that all new partners receive the same number of training hours regardless of their prior experience", "Because inconsistent teaching leads to inconsistent execution — partners need to learn the right way every time", "To satisfy district manager audits that verify all training documentation matches the approved curriculum", "Because partners need to be tested on the same material to ensure fairness in training assessments"], answer: 1, feedback: "Consistency in teaching means consistent execution in the store. If one trainer teaches the blended beverage routine differently from another, partners will produce inconsistent results. Starbucks' quality promise depends on every partner learning the same standards, in the same sequence, every time." },
-  { q: "What is the best way for a trainer to build a new partner's confidence on the espresso bar?", opts: ["Assigning them to the espresso bar during a quiet period with no supervision to build independence early", "Introducing the bar progressively — simpler skills first, with the trainer nearby to support and encourage", "Showing the partner a completed beverage and asking them to reproduce it independently within 10 minutes", "Giving the partner complete autonomy from day one so they learn through real-world experience fastest"], answer: 1, feedback: "Building confidence requires progressive challenge — not thrown in the deep end, not held back indefinitely. Starting with simpler components (e.g., calling drinks, adding syrups) before full espresso bar responsibility, with the trainer nearby to support, builds genuine confidence through earned competence rather than trial by fire." },
-  { q: "What makes the 'Show' step of training effective?", opts: ["Showing the skill at double speed first so the learner can see what mastery looks like at full pace", "Demonstrating the skill clearly, at normal pace, while narrating your thinking and decision-making aloud", "Showing a training video rather than a live demonstration to ensure standardized content delivery", "Demonstrating the skill twice — once correctly and once incorrectly — so the learner can spot the difference"], answer: 1, feedback: "An effective Show narrates the thinking, not just the action. 'I'm positioning the steam wand just below the surface — I'll hear a slight hissing that tells me I'm aerating the milk' gives the learner access to the expert's mental process, not just the physical movements. Narrating thinking is the bridge between demonstration and understanding." },
-  { q: "How should a trainer respond when a new partner makes a mistake during practice?", opts: ["Stop the practice immediately and repeat the full Tell and Show steps before allowing another attempt", "Let the moment pass and address it at the end of the shift during the formal feedback conversation", "Acknowledge the mistake supportively, ask what they think happened, and guide them toward the correction", "Use the mistake as a teaching example for other new partners in the group to learn from collectively"], answer: 2, feedback: "Responding to mistakes with curiosity rather than correction is the hallmark of coaching. 'What do you think happened there?' invites the partner to analyze their own performance, builds metacognition, and transfers ownership. The trainer guides; the partner discovers. That moment of insight is far more powerful than being told the answer." },
-  { q: "What is the function of training checklists in the Starbucks Barista Trainer role?", opts: ["To provide a legally binding record of all skills taught in case of future partner disputes", "To ensure consistent coverage of all required skills and track learner progress systematically", "To replace verbal feedback by giving the learner a written assessment they can review independently", "To help the store manager decide whether a new partner is ready for promotion at 90 days"], answer: 1, feedback: "Training checklists ensure nothing falls through the cracks — every required skill is covered, documented, and tracked. They create accountability for both the trainer and the learner, and provide a shared reference point for ongoing coaching conversations throughout the training period." },
-  { q: "What is the key principle behind giving positive reinforcement during training?", opts: ["Positive reinforcement should be reserved for genuinely exceptional performance to preserve its meaning", "Specific acknowledgment of what went well builds the behaviors you want to see repeated", "Positive feedback is primarily for new partners — experienced baristas should receive more balanced critiques", "Partners respond better to rewards like gift cards or early breaks than to verbal acknowledgment"], answer: 1, feedback: "Specific positive reinforcement ('Your steam wand angle was perfect and the foam texture was exactly right — that's the Starbucks standard') tells the learner precisely what to repeat. Vague praise ('nice job') doesn't teach anything. Specific acknowledgment reinforces the exact behaviors that lead to mastery." },
-  { q: "What is meant by 'two-way communication' in a training session?", opts: ["Both the trainer and store manager are present to share feedback from different perspectives", "The trainer both gives information and actively listens — asking questions, checking understanding, and inviting input", "Using both verbal and written communication during training to accommodate different learner needs", "Requiring the learner to repeat instructions back verbatim to confirm they have heard them correctly"], answer: 1, feedback: "Two-way communication means the trainer is not broadcasting — they are in dialogue. Asking questions ('does that make sense?'), checking for understanding ('show me how you'd do that'), and genuinely listening to the learner's responses makes training collaborative and far more effective than one-way instruction." },
-];
-
-// ─── MODULE 2: BREW & CRAFT (200 questions) ───────────────────────────────────
-const mod2Pool = [
-  { q: "What are the four factors that affect espresso extraction quality?", opts: ["Bean variety, country of origin, altitude, and harvest season", "Dose, grind size, water temperature, and extraction time — the four variables a barista controls", "Machine pressure, cup size, milk temperature, and syrup quantity", "Tamping pressure, shot volume, steam temperature, and cup preheating method"], answer: 1, feedback: "The four controllable extraction variables are: Dose (how much coffee is used), Grind Size (how coarsely or finely the beans are ground), Water Temperature (which dissolves different flavor compounds at different rates), and Extraction Time (how long water is in contact with the grounds). Changing any one variable changes the cup." },
-  { q: "What is 'extraction' in the context of espresso brewing?", opts: ["The mechanical process of removing espresso grounds from the portafilter after pulling a shot", "The process by which hot water dissolves and draws out soluble compounds from ground coffee", "The separation of espresso crema from the liquid shot before it is poured into the cup", "The filtration step that removes bitterness from espresso before it reaches the final beverage"], answer: 1, feedback: "Extraction is the process by which hot, pressurized water dissolves soluble compounds — acids, sugars, oils, and other flavor molecules — from the ground coffee. Under-extraction (too fast, too coarse) produces sour, weak shots. Over-extraction (too slow, too fine) produces bitter, harsh shots. Proper extraction yields balanced sweetness, acidity, and body." },
-  { q: "What does 'under-extraction' taste like, and what causes it?", opts: ["Bitter and harsh — caused by too fine a grind, too long an extraction time, or too hot water", "Sour, sharp, and thin — caused by too coarse a grind, too short an extraction time, or insufficient dose", "Flat and weak — caused by insufficient tamping pressure that compresses the grounds unevenly", "Sweet and syrupy — caused by over-dosing the portafilter beyond the standard recipe parameters"], answer: 1, feedback: "Under-extracted espresso tastes sour, sharp, thin, and lacks sweetness because water moved through the grounds too quickly, dissolving only the light acids and missing the heavier sugars and oils. Common causes: grind too coarse, extraction time too short, water temperature too low, or dose too light." },
-  { q: "What does 'over-extraction' taste like, and what causes it?", opts: ["Sour and weak — too coarse a grind allows water to pass through without sufficient contact time", "Bitter, harsh, and dry — caused by too fine a grind, too long an extraction, or too hot water", "Sweet and smooth — water spent enough time extracting all desirable flavor compounds from the grounds", "Thin and acidic — caused by insufficient dose relative to the volume of water used in the shot"], answer: 1, feedback: "Over-extracted espresso tastes bitter, harsh, and dry because water spent too long dissolving compounds — eventually pulling out the undesirable bitter molecules that come last in the extraction sequence. Causes: grind too fine, extraction time too long, water temperature too high, or over-tamping restricting flow." },
-  { q: "What is the ideal espresso shot extraction time at Starbucks?", opts: ["15–20 seconds — a short extraction that preserves the most delicate aromatic compounds", "20–30 seconds — the standard window for balanced espresso extraction at Starbucks", "35–45 seconds — a longer extraction that maximizes body and minimizes acidity in the cup", "10–15 seconds — optimized for speed during peak hours without compromising beverage quality"], answer: 1, feedback: "The standard Starbucks espresso extraction window is 20–30 seconds. Within this range, water dissolves the right balance of acids, sugars, and oils to create a balanced, complex shot. Outside this window — shorter means under-extraction (sour), longer means over-extraction (bitter)." },
-  { q: "What is espresso 'crema' and what does it indicate about shot quality?", opts: ["The dark layer of concentrated coffee solids that sink to the bottom of a properly pulled espresso shot", "The golden-brown, fine foam layer on top of espresso formed from emulsified oils — indicating a fresh, well-extracted shot", "The steam produced by the machine during shot extraction that indicates correct pressure and temperature", "A layer of undesirable bitter compounds that should be skimmed off before a shot is added to milk"], answer: 1, feedback: "Crema is the golden-brown, velvety foam on top of a well-pulled espresso shot — formed from emulsified coffee oils and carbon dioxide. Good crema indicates fresh beans, correct grind, appropriate pressure, and proper extraction. Pale, thin crema suggests stale beans or under-extraction; dark, disappearing crema may indicate over-extraction." },
-  { q: "What is the purpose of tamping espresso grounds in the portafilter?", opts: ["To measure the correct dose of coffee before inserting the portafilter into the group head", "To compress the grounds into an even, level puck that creates consistent resistance to water flow during extraction", "To remove air pockets that would cause channeling and uneven extraction if left untreated", "To pre-heat the grounds so they are at the correct temperature before water passes through them"], answer: 1, feedback: "Tamping creates a uniform, dense puck of coffee grounds that offers consistent resistance to the pressurized water. An even tamp means water flows through the entire puck evenly, extracting consistently. An uneven tamp creates channels — paths of least resistance — where water rushes through without extracting, leaving the rest over-extracted." },
-  { q: "What is 'channeling' in espresso extraction and what causes it?", opts: ["The metallic sound made by the espresso machine when pressure is too high or the portafilter is improperly seated", "When water finds a path of least resistance through the puck and rushes through unevenly, causing inconsistent extraction", "The flow of espresso through the spouts into the cup, which should be an even, honey-like stream", "A calibration error in the espresso machine's pump that leads to inconsistent pressure during extraction"], answer: 1, feedback: "Channeling occurs when water finds a weak spot in the grounds puck — usually caused by uneven tamping, inconsistent dosing, or a cracked puck — and flows through that channel rather than through the entire bed of coffee. The result is simultaneously under-extracted in most of the puck and over-extracted in the channel. The shot tastes unbalanced and often bitter-sour simultaneously." },
-  { q: "What is microfoam and what differentiates it from regular steamed milk froth?", opts: ["Microfoam is milk heated above 200°F to create a thick, insulating layer on top of hot beverages", "Microfoam is velvety, fine-bubbled steamed milk with a glossy surface, created by introducing small amounts of air while heating", "Microfoam is a thin layer of foam created by blending rather than steaming, used in iced espresso beverages", "Microfoam is a term for the foam produced by plant-based milks, which create smaller bubbles than dairy milk"], answer: 1, feedback: "Microfoam is the result of perfectly steamed milk — a glossy, velvety, fine-bubbled texture that integrates smoothly with espresso. It's created by introducing a small amount of air just below the milk surface while simultaneously heating. Large-bubbled froth (macrofoam) is created by introducing too much air too aggressively — it's unstable and doesn't pour cleanly." },
-  { q: "What happens when you introduce too much air into milk while steaming?", opts: ["The milk reaches the correct temperature faster, saving time during high-volume periods", "Large, unstable bubbles form — producing a frothy, airy foam that doesn't integrate well and separates quickly", "The milk's fat content is reduced, making it a lower-calorie option suitable for dietary-restricted customers", "The milk becomes over-aerated and develops a slightly sweet flavor from the breakdown of milk sugars"], answer: 1, feedback: "Too much air produces large, unstable bubbles — the kind you might see in soapy water. This macrofoam sits on top of the drink without integrating, dries out quickly, and cannot be used for latte art. Microfoam requires precise air introduction — just enough at the right moment to create the glossy, velvety texture that defines a well-crafted Starbucks beverage." },
-  { q: "What is 'latte art' and what does it require to execute successfully?", opts: ["Decorative patterns printed on cup sleeves and lids using food-safe inks for special occasions", "Patterns created in the foam surface of espresso beverages by pouring textured steamed milk in a controlled way", "Flavored designs added to the top of beverages using syrups and powders in a freehand technique", "Computer-controlled patterns created by modern Starbucks espresso machines during automated beverage production"], answer: 1, feedback: "Latte art is created by pouring properly textured microfoam into espresso in a controlled, intentional way — the contrast between the white foam and dark espresso creates patterns like hearts, rosettas, and tulips. Successful latte art requires: correct microfoam texture, proper espresso crema, the right pour speed and angle, and wrist movement technique." },
-  { q: "Why is the steam wand angle critical when steaming milk?", opts: ["The angle determines how much milk is heated — a steeper angle heats less milk for smaller beverages", "The angle controls how air is introduced and how the milk circulates — wrong angles produce large bubbles or no aeration", "A specific angle is required to comply with health and safety regulations for hot liquid handling in food service", "The angle affects the rate at which lactose is converted to simpler sugars, changing the final sweetness of the milk"], answer: 1, feedback: "The steam wand angle determines two things: whether air is being introduced (angling tip near surface) and whether the milk is spinning properly (angling slightly off-center to create a whirlpool). The wrong angle produces either a flat, un-aerated milk or a chaotic, large-bubbled froth. Getting the angle right is the most technically demanding part of milk steaming." },
-  { q: "What sensory characteristics does a well-extracted espresso shot have?", opts: ["A pale yellow color, watery body, and a clean, neutral flavor with low acidity and bitterness", "A rich golden crema, full body, balanced sweetness, pleasant acidity, and complex bittersweet finish", "A dark brown color, oily surface, and an intensely bitter flavor that cuts through milk completely", "A bright green-brown hue, very high acidity, and a fruity, wine-like flavor from light roasting"], answer: 1, feedback: "A well-extracted shot has: golden crema (indicating proper extraction and fresh beans), full body (weight on the palate), balanced sweetness (from properly dissolved sugars), pleasant brightness (from well-extracted acids), and a complex bittersweet finish. The goal is harmony — no single characteristic should dominate." },
-  { q: "What does 'dose' refer to in the context of espresso preparation?", opts: ["The number of espresso shots used in a specific beverage recipe per size and drink type", "The specific amount of ground coffee, measured in grams, used to fill the portafilter for each shot", "The strength level of the espresso selected on the machine for the current customer's preference", "The volume of water programmed to pass through the portafilter during the extraction cycle"], answer: 1, feedback: "Dose refers to the mass of ground coffee used to prepare the espresso — measured in grams. At Starbucks, automatic machines are calibrated to dose consistently, but understanding dose is essential because too little (thin, weak shot) and too much (restricted flow, bitter shot) directly affect quality. Dose is the first variable in the extraction equation." },
-  { q: "What is the role of water temperature in espresso extraction?", opts: ["It only affects the time it takes to complete the shot, not the flavor compounds dissolved", "Different temperatures dissolve different flavor compounds — too hot extracts bitterness, too cool under-extracts acids", "Higher water temperature produces a creamier, more textured shot due to increased oil emulsification", "Water temperature primarily affects the temperature of the final beverage, not the extraction process itself"], answer: 1, feedback: "Water temperature is critical because different flavor compounds dissolve at different temperatures. Too cool: only light acids dissolve, producing sour, thin shots. Too hot: bitter compounds extract excessively, producing harsh shots. The ideal range (around 195–205°F / 90–96°C) extracts the full, balanced profile of the coffee without over- or under-extracting." },
-  { q: "How does grind size affect espresso extraction?", opts: ["Finer grinds produce lighter, more acidic shots; coarser grinds produce darker, heavier shots", "Finer grinds slow water flow and increase extraction; coarser grinds speed flow and reduce extraction", "Grind size only affects the appearance of the crema, not the flavor or extraction of the shot", "Coarser grinds produce more consistent extraction; finer grinds are only used in low-volume settings"], answer: 1, feedback: "Grind size is one of the most powerful extraction variables. Fine grind = more surface area, more resistance, slower water flow, more extraction (risk: over-extraction, bitter). Coarse grind = less surface area, less resistance, faster water flow, less extraction (risk: under-extraction, sour). Grind adjustment is how baristas dial in espresso quality." },
-  { q: "What is a 'lungo' espresso, and how does it differ from a standard shot?", opts: ["A double espresso shot pulled at double strength — used for beverages requiring a more intense coffee flavor", "A longer espresso shot pulled with more water — creating a larger volume, lighter body, and different flavor profile", "An espresso shot with a longer rest time before being added to the beverage — for better crema development", "A ristretto-style shot pulled slowly to concentrate all espresso solids into a smaller volume"], answer: 1, feedback: "A lungo ('long' in Italian) is pulled with more water than a standard shot, extending the extraction. The result is larger volume, lighter body, and a different — sometimes more bitter — flavor profile as more compounds are extracted. At Starbucks, specific beverages call for lungo shots, particularly in the Clover Vertica system." },
-  { q: "What is a 'ristretto' shot, and why might a customer request one?", opts: ["A decaffeinated espresso shot that uses less coffee to reduce the bitterness of the caffeine removal process", "A shorter, more concentrated espresso shot with less water — sweeter, heavier, and more intense than standard", "A single espresso shot specifically calibrated for Tall-size beverages in the standard size framework", "An espresso variant made with cold water rather than hot, producing a smoother, less acidic flavor"], answer: 1, feedback: "A ristretto ('restricted' in Italian) is pulled with less water — stopping extraction before the bitter compounds are fully dissolved. The result is a smaller volume, sweeter, more syrupy, and intensely concentrated shot with a heavier body. Many customers and specialty coffee enthusiasts prefer ristretto for its sweetness and complexity." },
-  { q: "What causes espresso to taste 'sour' rather than balanced?", opts: ["Excessive caffeine content from using too many shots relative to the beverage size and milk ratio", "Under-extraction — water passed through the grounds too quickly, dissolving only light acids and missing sweeter compounds", "The use of light-roast beans that retain more of the coffee's natural acidity after roasting", "Incorrect milk steaming technique that allows acidic steam to contact the espresso before serving"], answer: 1, feedback: "Sourness in espresso is the hallmark of under-extraction. When water passes through too quickly (coarse grind, short time, cool temperature, or light dose), only the lighter, more acidic compounds dissolve — the sugars and heavier oils that balance the cup are left behind. The fix is to adjust grind finer, increase time, or check temperature." },
-  { q: "What is the purpose of purging the steam wand before and after steaming milk?", opts: ["To cool the wand to a safe temperature before placing it in the milk to avoid scalding", "To remove condensed water and milk residue — ensuring clean, dry steam for proper aeration and preventing contamination", "To calibrate the steam pressure for each new pitcher size to ensure even heating results", "To signal to the espresso machine that steaming is complete so it can reset for the next function"], answer: 1, feedback: "Purging the steam wand before steaming removes condensed water that would dilute and thin the milk. Purging after steaming removes any milk residue before it dries and clogs the tip. Both purges are essential for cleanliness, food safety, and consistent steaming quality. Always wipe the wand immediately after purging." },
-  { q: "What is a 'doppio' and when is it typically used at Starbucks?", opts: ["A single espresso shot served in a small cup — used for beverages requiring minimal coffee intensity", "A double espresso shot pulled together — the standard base for most Starbucks espresso beverages", "Two separate single shots pulled sequentially and combined — distinguishable from a true double shot", "A Starbucks-exclusive espresso format with a specific pressure profile not found in traditional Italian espresso"], answer: 1, feedback: "A doppio is a double espresso shot — the two shots are pulled simultaneously through a double-spouted portafilter. It is the standard espresso base for most Starbucks beverages. A Tall drink typically has one shot (or a doppio in some markets), a Grande has two shots, and a Venti has three shots." },
-  // ... continuing
-  { q: "What role does coffee freshness play in espresso quality?", opts: ["Freshness only affects aroma — the flavor compounds in espresso remain stable for up to 60 days after roasting", "Freshly roasted beans contain carbon dioxide that creates crema and protects flavor — stale beans produce flat, lifeless shots", "Freshness matters primarily for cold brew preparation, where extended steep time compensates for any age-related flavor loss", "The espresso machine compensates for bean freshness through automated pressure and temperature adjustments"], answer: 1, feedback: "Freshly roasted coffee contains carbon dioxide (CO2) that actively protects flavor compounds and contributes to crema formation. As beans age, CO2 escapes, oils oxidize, and flavor degrades — producing flat, thin shots with poor crema. Starbucks' commitment to freshness at every stage — from roast to brew — is inseparable from the quality promise." },
-  { q: "What is the 'Four Fundamentals' quality framework for beverages at Starbucks?", opts: ["Fresh, Hot, Correct, and Fast — the four dimensions of every successfully executed beverage", "Right Drink, Right Size, Right Temperature, and Right Customization — the four quality checkpoints for every beverage", "Grind, Dose, Extract, and Steam — the four technical steps that determine espresso beverage quality", "Connect, Craft, Call, and Correct — the four phases of the espresso bar routine from order to handoff"], answer: 1, feedback: "The Four Fundamentals are: Right Drink (correct recipe and ingredients), Right Size (correct cup and volume), Right Temperature (standard or as customized), and Right Customization (every modification correctly applied). Checking these four points on every beverage ensures consistent quality across all positions and all partners." },
-  { q: "How does milk fat content affect steaming and microfoam quality?", opts: ["Higher fat content makes milk harder to aerate, so nonfat milk always produces the best microfoam for lattes", "Whole milk's higher fat creates a creamier, richer microfoam texture; nonfat milk creates denser, more stable foam with more bubbles", "Fat content has no meaningful effect on steaming quality — the steam wand technique is the only relevant variable", "Lower fat milks overheat faster and require shorter steaming times regardless of beverage size or serving temperature"], answer: 1, feedback: "Fat content dramatically affects steaming results. Whole milk's fat creates a rich, creamy, velvety microfoam that integrates beautifully with espresso. Nonfat milk's protein structure (without fat) creates a denser, more stable foam with finer bubbles — ideal for cold foam. Plant-based milks behave differently again, each requiring slightly adjusted technique." },
-  { q: "What does a proper milk 'whirlpool' during steaming accomplish?", opts: ["It cools the milk more evenly, preventing hot spots that could scald the foam during the steaming process", "It integrates the foam and liquid milk into a uniform, velvety texture by spinning the milk in a circular motion", "It indicates that the steam wand is at the correct depth and the milk has reached target temperature", "It reduces the steaming time required by increasing the surface area of milk exposed to the steam"], answer: 1, feedback: "Creating a whirlpool (by angling the steam wand slightly off-center) spins the milk in a circular motion that integrates the aerated foam into the bulk of the milk, breaking down large bubbles and creating a uniform, glossy microfoam texture. Without the whirlpool, foam and liquid milk separate and the texture is inconsistent." },
-  { q: "What is the correct way to clean the steam wand immediately after steaming?", opts: ["Submerge the wand in a container of clean water and activate steam to purge milk residue from inside", "Immediately purge the wand, then wipe it with a damp cloth — removing all milk residue before it dries and clogs the tip", "Allow the wand to cool completely before wiping to avoid burning your hands on the hot metal surface", "Use a dedicated cleaning solution and a specialized brush to remove any milk proteins from inside the wand"], answer: 1, feedback: "The correct post-steaming sequence is: purge immediately (to clear milk from inside the wand tip), then wipe with a damp cloth (to remove surface milk before it dries). Dried milk proteins are extremely difficult to remove and can harbor bacteria, clog the steam tip, and degrade future steaming performance." },
-  { q: "What is the sensory significance of espresso's acidity?", opts: ["Acidity indicates that the espresso is under-roasted and should be used only in blended or cold beverages", "Acidity provides brightness and liveliness — when balanced, it is a positive characteristic that makes the cup interesting", "Acidity is a defect in espresso that indicates the beans were sourced from lower-elevation growing regions", "High acidity in espresso means the water used during extraction was not properly filtered or pre-heated"], answer: 1, feedback: "Acidity in espresso — when balanced — is a positive sensory characteristic. It provides brightness, liveliness, and complexity. Think of the crisp finish of a citrusy Ethiopian coffee. Acidity becomes negative only when it dominates, usually from under-extraction. A balanced espresso has acidity working with sweetness and body rather than overwhelming them." },
-  { q: "What does 'body' mean when describing espresso or brewed coffee?", opts: ["The amount of caffeine in the beverage, which creates a physical sensation of alertness after consumption", "The weight, thickness, and mouthfeel of the liquid — the physical sensation of the coffee on the palate", "The visual depth of color in the cup, from light amber (weak) to dark brown (strong)", "The persistence of flavor after swallowing — how long the taste remains on the palate after each sip"], answer: 1, feedback: "Body is the physical sensation of weight and texture on the palate. A full-bodied espresso feels thick and coating — like whole milk. A light-bodied brew feels thin and clean — like water. Body comes from dissolved oils, proteins, and other compounds. Roast level, brewing method, and extraction all affect body significantly." },
-  { q: "What is the role of the espresso machine's pump pressure in extraction quality?", opts: ["Pump pressure determines the temperature of the water used during extraction and can be adjusted per recipe", "Nine bars of pressure forces water through the compacted coffee puck, emulsifying oils and creating crema", "The pump controls how much water enters the portafilter and sets the final volume of the espresso shot", "Pressure is calibrated to match the grind size — finer grinds require lower pressure, coarser grinds require higher pressure"], answer: 1, feedback: "Espresso machines operate at approximately 9 bars (130 psi) of pump pressure — far more than other brewing methods. This pressure forces water through the tightly compacted coffee puck, dissolving compounds rapidly, emulsifying oils into the water (creating crema), and extracting a concentrated, complex shot in under 30 seconds." },
-];
-
-// ─── MODULE 3: ROAST & BLEND (200 questions) ──────────────────────────────────
-const mod3Pool = [
-  { q: "What happens to coffee beans during the roasting process at a chemical level?", opts: ["Moisture is added to the beans to soften them and make them easier to grind after roasting", "The Maillard reaction and caramelization transform raw, grassy beans into complex, aromatic, flavorful coffee", "Caffeine is removed through the application of heat, which is why darker roasts have less caffeine than light", "The beans are sterilized by heat to eliminate any bacteria or mold that developed during the drying process"], answer: 1, feedback: "Roasting triggers the Maillard reaction (amino acids + sugars = complex flavor compounds) and caramelization of sugars, developing hundreds of volatile aromatic compounds and transforming the bean's flavor profile from raw and grassy to complex, nuanced, and aromatic. The roaster's skill lies in controlling these reactions to achieve the desired profile." },
-  { q: "What are Starbucks' three roast profiles, and how do they differ?", opts: ["Light, Medium, and Dark — the three universal roast levels used across all specialty coffee brands", "Blonde (lightest), Medium, and Dark — three distinct profiles each emphasizing different flavor characteristics", "City, Full City, and French — the traditional roasting terminology used in Starbucks' training materials", "Green, Amber, and Mahogany — Starbucks' proprietary color-coded roast classification system"], answer: 1, feedback: "Starbucks uses three roast profiles: Blonde (lightest roast — mellow, soft, subtle; higher acidity, lighter body), Medium (balanced, smooth, rounded — the middle ground), and Dark (bold, rich, caramelized; lower acidity, heavier body, deeper roasted notes). Each profile unlocks different flavor characteristics from the same green bean." },
-  { q: "What characterizes a Blonde Roast coffee from Starbucks?", opts: ["A bold, intense flavor with low acidity and a heavy body developed through extended roasting time", "A mellow, soft, and subtle flavor with higher acidity, lighter body, and a smooth, gentle finish", "A balanced, rounded profile that sits exactly between light and dark roast characteristics", "A sweet, caramel-forward flavor developed from the full caramelization of natural sugars in the bean"], answer: 1, feedback: "Blonde Roast is Starbucks' lightest roast — it stops roasting before the first crack fully develops. The result is a mellow, soft, subtle cup with higher acidity (brightness), lighter body, and gentle flavors. For customers who find medium or dark roasts too intense, Blonde offers a milder, more delicate coffee experience." },
-  { q: "What is the 'first crack' in coffee roasting and why is it significant?", opts: ["The first visible crack in the bean's surface that indicates moisture is being lost at the start of roasting", "An audible popping of the bean caused by steam pressure as water evaporates and the bean expands — marking the transition from light to medium roast", "The cracking of the bean's outer silver skin, which must be removed before the bean can be packaged", "The first sign that the roasting drum has reached the correct temperature for medium-roast coffee production"], answer: 1, feedback: "The first crack is a critical roasting milestone — a series of audible pops caused by steam pressure as moisture escapes and the bean rapidly expands. Stopping before the first crack = very light roast. During the first crack = light to medium. After = medium to dark. The first crack marks the onset of the flavor development phase." },
-  { q: "What is the 'second crack' in coffee roasting and what roast level does it indicate?", opts: ["A second round of steam release that indicates the bean has reached the ideal moisture content for medium roast", "A quieter, faster series of cracks as the cell structure of the bean fractures — indicating a very dark roast", "The point at which the bean's surface oils break through — signaling that the Maillard reaction is complete", "A quality defect where beans crack unevenly, indicating inconsistent heat distribution in the roasting drum"], answer: 1, feedback: "The second crack is quieter and faster than the first — caused by the breakdown of the bean's cell structure as the roast develops beyond medium. Coffee roasted into or past the second crack is at the dark roast level. The bean's surface oils begin to migrate outward, giving dark roasts their characteristic shiny appearance." },
-  { q: "How does roast level affect caffeine content in coffee?", opts: ["Darker roasts have significantly more caffeine because the extended roasting concentrates caffeine in the bean", "Lighter roasts actually retain slightly more caffeine — roasting does destroy small amounts — but the difference is minimal", "Roast level has no effect on caffeine content — caffeine is stable at all roasting temperatures encountered commercially", "Medium roasts have the highest caffeine because they stop at the optimal point before caffeine begins to degrade"], answer: 1, feedback: "This is a common misconception. Darker roasts actually have slightly less caffeine than lighter roasts because roasting does degrade a small amount. However, the difference is minimal — the far greater factor is the brewing method and dose. Dark roast ≠ more caffeine. The bold flavor creates the impression of strength, but lighter roasts are marginally higher in caffeine." },
-  { q: "What is the purpose of 'blending' different coffee origins at Starbucks?", opts: ["To reduce production costs by combining lower-quality beans with premium single-origin coffees", "To create consistent, complex flavor profiles that achieve a specific character no single origin could deliver alone", "To meet the volume demands of global scale by combining beans from multiple farms in each region", "To offset seasonal variation by substituting different origins when a preferred farm's harvest is unavailable"], answer: 1, feedback: "Blending is a craft decision — the goal is to create a cup that is greater than the sum of its parts. Each origin contributes specific characteristics: one might bring body, another brightness, another sweetness. Starbucks' blends — like Pike Place and Espresso Roast — are designed to achieve specific, reproducible flavor profiles that single origins couldn't deliver consistently." },
-  { q: "What is 'Pike Place Roast' and what flavor characteristics define it?", opts: ["A bold, dark roast named after the Seattle fish market — known for its smoky, intense espresso character", "A smooth, well-rounded medium roast with subtle cocoa and toasted nut notes — designed to be approachable every day", "A light blonde roast inspired by the farmers' market aesthetic — fresh, bright, and citrus-forward", "A seasonal dark roast blend made with beans from the Pacific Northwest region of North America"], answer: 1, feedback: "Pike Place Roast is Starbucks' signature medium roast — a blend crafted to be balanced, smooth, and deeply approachable. Named after the Pike Place Market in Seattle where Starbucks opened its first store, it features subtle cocoa and toasted nut notes with a clean, well-rounded finish. It's designed for every day, every person, every cup." },
-  { q: "What is the 'Espresso Roast' blend and what makes it unique for espresso preparation?", opts: ["The lightest roast Starbucks offers — its high acidity and brightness cut through milk in espresso beverages", "A dark, sweet roast blend developed specifically for espresso — with caramel sweetness and the roasty depth needed to stand up to milk", "A single-origin dark roast from Italy — used exclusively in Starbucks' handcrafted espresso beverages", "A proprietary blend that only works in Starbucks' automatic espresso machines due to its specialized grind profile"], answer: 1, feedback: "Starbucks Espresso Roast is a dark blend crafted specifically to perform under pressure — literally. Its caramel sweetness, rich body, and roasty depth are designed to hold up beautifully through milk, delivering a recognizable espresso character in every latte, cappuccino, and Americano. Its dark roast development is calibrated for 9-bar extraction." },
-  { q: "What does 'green coffee' refer to in the supply chain context?", opts: ["Coffee beans that have been mildly roasted to the early blonde stage — still retaining their original green hue", "Unroasted coffee beans — the raw agricultural product harvested and processed before roasting transforms them", "Environmentally certified coffee that meets specific sustainability criteria set by third-party organizations", "Coffee sourced exclusively from farms operating under organic and pesticide-free agricultural practices"], answer: 1, feedback: "Green coffee refers to unroasted coffee beans — the raw agricultural product. At this stage, they are dense, hard, and grassy-smelling. Green coffee has potential, not flavor. The entire flavor development process — from the delicate floral notes of a light roast to the bold smokiness of a dark roast — happens in the roaster." },
-  { q: "What is the 'development time ratio' in coffee roasting?", opts: ["The percentage of total roasting time spent after the first crack — determining how much flavor develops post-crack", "The ratio of blonde to dark roast production at each Starbucks roasting facility per year", "The amount of time green coffee beans spend in the pre-heating phase before actual roasting begins", "The relationship between batch size and drum speed that determines how evenly beans are roasted"], answer: 0, feedback: "Development time ratio (DTR) is the percentage of total roast time spent after the first crack. It's a critical quality variable — too little development and the coffee tastes grassy and under-developed; too much and it loses origin characteristics and tastes roasty and flat. Master roasters use DTR to dial in precise, reproducible roast profiles." },
-  { q: "What flavor characteristics are typically associated with a dark roast?", opts: ["High acidity, light body, and delicate floral and fruit notes from minimal roasting development", "Bold, rich, roasty flavors with lower acidity, heavier body, and caramelized or slightly smoky notes", "Sweet, syrupy, and intensely fruity — from the maximum caramelization of natural sugars during extended roasting", "Neutral, clean, and mild — making dark roast ideal for blending without contributing dominant flavors"], answer: 1, feedback: "Dark roasts are characterized by bold, roasty flavors — the extended time in the drum caramelizes sugars deeply, reduces acidity (acids are degraded by heat), and produces heavier body. The origin characteristics of the bean are largely transformed into roast-driven flavors: smoky, dark chocolate, caramelized, and deep. This is what makes dark roast stand up to milk." },
-  { q: "What flavor characteristics are typically associated with a light or blonde roast?", opts: ["Bold, smoky, and intensely roasted — with a heavy body that coats the palate after each sip", "Mellow, soft, and subtle — with higher acidity, lighter body, and more preserved origin characteristics", "Deeply caramelized and sweet — with a syrupy texture from maximum development of natural sugars", "Neutral and clean — designed to be a blank canvas for milk and syrups in espresso beverages"], answer: 1, feedback: "Light/blonde roasts preserve more of the bean's original character — the flavors from origin, altitude, variety, and processing method come through more clearly than in a dark roast. Acidity is higher (acids haven't been degraded by heat), body is lighter, and the cup may have floral, fruity, or citrusy notes that darker roasts transform into roasty, caramelized flavors." },
-  { q: "What is 'degassing' and why is it important for roasted coffee?", opts: ["A quality control process that removes oxygen from coffee packaging to extend shelf life after roasting", "The natural release of CO2 from freshly roasted beans — important because excessive CO2 can disrupt extraction", "A green coffee processing step that removes gaseous compounds before beans are loaded into the roasting drum", "The venting of steam from the roasting drum after the roasting cycle is complete to cool the beans rapidly"], answer: 1, feedback: "Freshly roasted coffee releases significant CO2 — a byproduct of the roasting process. If ground and brewed immediately, excessive CO2 disrupts extraction and can create sour, uneven shots. This is why fresh coffee often benefits from a short rest (1–7 days post-roast). Coffee packaging with one-way valves allows CO2 to escape without letting oxygen in." },
-  { q: "What does 'roast consistency' mean and why does it matter for Starbucks?", opts: ["The ability to roast the same bean to identical color and moisture specifications every single time", "Ensuring that every roasted batch delivers the same flavor profile customers expect from a specific blend", "Maintaining the same roasting duration across all three roast profiles regardless of origin or batch size", "Using the same roasting equipment and facilities for all Starbucks coffee to prevent quality variation"], answer: 1, feedback: "Roast consistency means delivering the same flavor experience every time a customer orders a Pike Place or requests an Espresso Roast. Starbucks customers in Manila, Milan, and Minneapolis expect the same cup. This requires precise roasting protocols, quality control sampling, and the roaster's skill to compensate for natural variation in green coffee." },
-  { q: "What is the 'Starbucks Roast Spectrum' and how does it organize the company's coffees?", opts: ["A proprietary grading system that ranks coffees by quality from single-origin to commodity grades", "A visual framework organizing all Starbucks coffees along a continuum from Blonde to Medium to Dark roast", "A seasonal release calendar that determines when different roast profiles are available in stores each year", "A training tool that maps specific beverage recipes to the appropriate roast level for each drink"], answer: 1, feedback: "The Starbucks Roast Spectrum organizes the company's entire coffee lineup along a single continuum: Blonde (lightest, most subtle) → Medium (balanced, rounded) → Dark (bold, rich, caramelized). It's a communication tool for partners and customers — helping both understand how roast level affects flavor before the first sip." },
-  { q: "What role does blend consistency play in Starbucks' business model?", opts: ["It allows the company to expand into new markets with confidence that every customer gets the same experience", "It reduces the cost of sourcing by allowing multiple origins to be substituted without notifying customers", "It enables Starbucks to eliminate single-origin coffees from the menu and focus entirely on blended products", "It simplifies barista training by reducing the number of brewing protocols required across the menu"], answer: 0, feedback: "Blend consistency is core to Starbucks' global promise. When you order an Espresso Roast anywhere in the world, you should get the same cup. Blending allows Starbucks to maintain that consistency even as individual crop years vary — sourcing from multiple origins means no single harvest failure can disrupt the expected flavor profile." },
-  { q: "What is a 'single-origin' coffee and how does it differ from a blend?", opts: ["Coffee sourced from a single roasting facility rather than distributed across multiple production sites", "Coffee from one country, region, or even specific farm — showcasing the unique characteristics of that terroir", "Coffee made with a single variety of Coffea arabica — without mixing different botanical varieties", "A coffee that is only available during a specific season and is not part of Starbucks' year-round lineup"], answer: 1, feedback: "Single-origin coffees come from one specific place — a country, region, or even a single farm or cooperative. This allows the unique characteristics of that location's terroir (soil, altitude, climate, variety, processing) to shine without being modified by blending. Single-origins are often more complex and variable, changing with each year's harvest." },
-  { q: "Why is it important for a barista to understand the differences between roast levels?", opts: ["Because roast level affects brewing time and different roast levels require different machine settings", "Because it allows them to recommend coffees thoughtfully and explain flavor differences to curious customers", "Because darker roasts require more shots per beverage to compensate for lower caffeine content", "Because Starbucks' operational standards require roast level information to be shared at every transaction"], answer: 1, feedback: "Understanding roast levels transforms a product transaction into a coffee education moment. When a customer asks 'what's the difference between Blonde and Dark?', a knowledgeable partner can explain: Blonde is mellow and subtle with more brightness; Dark is bold and rich with caramelized depth. This builds customer trust and deepens the Starbucks Experience." },
-  { q: "What happens to a coffee bean's weight during roasting?", opts: ["The bean gains weight as roasting compounds are created through the Maillard and caramelization reactions", "The bean loses 15–25% of its weight as moisture and CO2 are driven out during the roasting process", "Weight remains stable during roasting — only the bean's color and surface chemistry are transformed", "The bean doubles in volume and weight as gases are trapped inside during the first-crack expansion"], answer: 1, feedback: "Coffee beans lose 15–25% of their weight during roasting — primarily from moisture evaporation. The bean simultaneously expands in size (volume increases as CO2 develops and the cell structure changes), which is why roasted beans are larger and lighter than the same weight of green beans. Darker roasts lose slightly more weight from additional moisture and CO2 loss." },
-  { q: "How does altitude affect the characteristics of green coffee that will be roasted?", opts: ["Higher altitude produces denser beans with greater complexity — because slower growing conditions allow more flavor to develop", "Lower altitude produces more flavorful beans because warmer temperatures accelerate the development of aromatic compounds", "Altitude has no measurable effect on flavor — it is primarily a geographical descriptor used in marketing", "Beans grown above 2000 meters develop naturally darker flavors and require a lighter roasting profile to balance"], answer: 0, feedback: "Higher altitude means cooler temperatures, which slow the cherry's development. Slower development creates denser beans with greater concentration of sugars, acids, and complex flavor compounds. High-grown (HG) or Strictly High Grown (SHG) beans typically produce more complex, brighter, and more aromatic coffees — hence the premium they command in specialty markets." },
-  { q: "What does 'caramelization' contribute to the roasting process?", opts: ["It converts caffeine into a more bioavailable form, increasing the stimulant effect of the roasted coffee", "It transforms the bean's natural sugars into caramel-like flavor compounds, adding sweetness and complexity", "It removes harsh acids from the bean's surface, producing a smoother, less acidic final cup", "It darkens the bean's outer skin to a consistent color regardless of the original green bean variety"], answer: 1, feedback: "Caramelization — the thermal transformation of sugars — is one of the two key reactions (alongside the Maillard reaction) responsible for coffee's complex flavors. As sugars caramelize, they transform into hundreds of different flavor compounds: nutty, buttery, sweet, and increasingly dark/bitter as the process continues. This is why dark roasts taste 'caramelized' or 'burnt sugar'-like." },
-  { q: "Why do Starbucks roasters select specific origins for specific blends?", opts: ["Origins are selected based on pricing and availability to achieve the most cost-effective blend composition", "Each origin contributes specific characteristics — body, brightness, sweetness, earthiness — that the blend intentionally combines", "Origins are selected based on geographical diversity to communicate global sourcing in brand marketing materials", "Starbucks uses a rotating origin selection to prevent over-reliance on any single farming region"], answer: 1, feedback: "Every origin brings something specific to the cup. Latin American coffees often contribute clean sweetness and balance. African coffees bring brightness and florality. Asia-Pacific origins often add body and earthiness. A master blender chooses origins the way a chef selects ingredients — each one plays a specific role in the final composition." },
-  { q: "What is the 'Starbucks Verismo' system and how does it relate to roasting?", opts: ["Starbucks' proprietary home espresso pod system — designed to deliver Espresso Roast quality at home", "Starbucks' automated in-store roasting system that allows baristas to customize roast profiles per shift", "Starbucks' green coffee classification system used to evaluate beans before they enter the roasting facility", "Starbucks' quality control testing protocol that verifies roast accuracy after each production batch"], answer: 0, feedback: "Starbucks Verismo was the company's at-home brewing pod system — designed to bring the Starbucks Espresso Roast experience into customers' kitchens. It connects roasting to the broader Starbucks philosophy: delivering consistent, craft-roasted coffee quality regardless of the format or location where the customer experiences it." },
-  { q: "What is the difference between Arabica and Robusta coffee varieties?", opts: ["Arabica grows in warm, flat regions and contains more caffeine; Robusta grows at altitude and is lower in caffeine", "Arabica is higher quality, grown at altitude, and has more complex flavors; Robusta is hardier, more caffeinated, and often harsher", "Arabica and Robusta are identical in flavor — the difference is only in the plant's leaf structure and growing region", "Robusta is preferred in specialty coffee for its superior body and complexity; Arabica is used primarily in commodity blends"], answer: 1, feedback: "Arabica (Coffea arabica) is the species Starbucks uses exclusively — it grows at higher altitudes, is more delicate, and produces complex, nuanced flavors. It contains less caffeine than Robusta (Coffea canephora), which is hardier, more disease-resistant, grows at lower altitudes, and contains roughly twice the caffeine but a harsher, more rubbery flavor profile." },
-  { q: "What is the significance of the 'roast date' on a bag of Starbucks coffee?", opts: ["It indicates when the coffee was harvested from the farm, which determines its freshness and flavor quality", "It tells the customer when the beans were roasted — after which flavor is at its peak and begins to gradually decline", "It is a regulatory requirement for all food products and has no specific significance for coffee flavor", "It indicates the sell-by date after which the product should be removed from the shelf and discarded"], answer: 1, feedback: "The roast date tells you when the coffee was roasted — the moment the clock started on peak flavor. Freshly roasted coffee reaches its flavor peak within days to weeks post-roast, then gradually declines as CO2 escapes, oils oxidize, and aromatic compounds dissipate. Knowing the roast date helps partners and customers choose the freshest possible coffee." },
-  { q: "How does Starbucks ensure quality consistency across different roasting facilities worldwide?", opts: ["By centralizing all roasting at a single facility in Seattle and shipping globally from that location", "Through standardized roasting protocols, precise quality control sampling, and trained roasters using calibrated equipment", "By purchasing all coffee pre-roasted from certified third-party roasters who meet Starbucks specifications", "By using fully automated roasting machines that eliminate human judgment from the roasting process entirely"], answer: 1, feedback: "Starbucks maintains quality consistency through standardized protocols (specific roast profiles for each blend), rigorous quality control (sensory evaluation of every batch), trained roast masters who understand both the science and craft of roasting, and calibrated equipment across facilities. This system allows local production with global consistency." },
-];
-
-// ─── MODULE 4: ORIGIN & ETHICS (200 questions) ────────────────────────────────
-const mod4Pool = [
-  { q: "Where did coffee cultivation and use as a beverage first originate?", opts: ["Brazil — the world's largest coffee producer, where coffee was first discovered growing wild in the Atlantic forest", "Ethiopia — where the Coffea arabica plant is native and coffee was first used by humans", "Yemen — where coffee was first commercially traded and brewed as a beverage in the 15th century", "Colombia — where the ideal altitude and climate first produced coffee suitable for mass cultivation"], answer: 1, feedback: "Coffee originated in Ethiopia — specifically in the Kaffa region, where Coffea arabica grows wild. Legend attributes its discovery to a goat herder named Kaldi who noticed his goats became energized after eating coffee cherries. From Ethiopia, coffee spread to Yemen, where it was first cultivated and brewed commercially in the 15th century, before spreading globally." },
-  { q: "What is 'C.A.F.E. Practices' and what does it stand for?", opts: ["Coffee Arabica Farming Excellence — a Starbucks quality certification for premium single-origin coffees", "Coffee and Farmer Equity Practices — Starbucks' ethical sourcing program verifying social, environmental, and economic standards", "Certified Arabica Farming Ethically — an international third-party program for sustainable coffee production", "Community Advancement for Farmers Everywhere — a non-profit development program co-funded by Starbucks"], answer: 1, feedback: "C.A.F.E. Practices stands for Coffee and Farmer Equity Practices — Starbucks' comprehensive ethical sourcing program developed with Conservation International. It verifies that farms meet standards across four areas: product quality, economic accountability (transparent payments to farmers), social responsibility (worker welfare), and environmental leadership (conservation practices)." },
-  { q: "What are the four pillars evaluated under Starbucks C.A.F.E. Practices?", opts: ["Quality, Sustainability, Community, and Innovation — the four dimensions of ethical Starbucks sourcing", "Product Quality, Economic Accountability, Social Responsibility, and Environmental Leadership", "Farm Certification, Worker Safety, Water Usage, and Carbon Footprint — four measurable environmental standards", "Transparency, Traceability, Fair Price, and Environmental Conservation — the four procurement principles"], answer: 1, feedback: "C.A.F.E. Practices evaluates four pillars: Product Quality (meeting Starbucks' rigorous cup quality standards), Economic Accountability (transparent financial reporting to ensure fair payment through the supply chain), Social Responsibility (safe, fair conditions for all workers), and Environmental Leadership (protecting water, biodiversity, soil health, and minimizing chemicals)." },
-  { q: "What is 'terroir' in the context of coffee growing?", opts: ["A French term referring to the roasting style preferred in European specialty coffee markets", "The total environmental factors — soil, altitude, climate, rainfall, and variety — that give a coffee its unique character", "The name for the geographic region from which a single-origin coffee is exclusively sourced", "A quality grading system used by Colombian coffee cooperatives to rank beans before export"], answer: 1, feedback: "Terroir (French: 'of the earth') describes the complete environmental fingerprint of a place — soil composition, altitude, rainfall patterns, temperature variation, sunlight, and the specific coffee variety grown there. Just as wine reflects its vineyard, coffee reflects its farm. Two farms 10 miles apart can produce dramatically different cups from the same variety." },
-  { q: "What are the three main coffee-growing regions, sometimes called the 'Coffee Belt'?", opts: ["North America, Europe, and Asia — the three major consumer markets that also produce artisan coffees", "Latin America, Africa, and Asia-Pacific — the three global producing regions spanning the equatorial belt", "Brazil, Colombia, and Ethiopia — the three largest producing countries that dominate global supply", "Central America, East Africa, and Southeast Asia — the most premium growing regions in specialty coffee"], answer: 1, feedback: "Coffee is grown in the equatorial belt between the Tropics of Cancer and Capricorn, in three major producing regions: Latin America (Brazil, Colombia, Guatemala, Mexico — typically balanced, sweet, nutty), Africa (Ethiopia, Kenya, Rwanda — typically bright, fruity, floral), and Asia-Pacific (Sumatra, Papua New Guinea, Indonesia — typically full-bodied, earthy, herbal)." },
-  { q: "What processing method is most associated with Ethiopian coffee and what flavor characteristics does it produce?", opts: ["Washed processing — creating clean, bright, and floral cups that highlight the bean's delicate natural characteristics", "Natural (dry) processing — where the coffee cherry dries whole, imparting fruit-forward, wine-like, and intensely sweet flavors", "Honey processing — a method that balances brightness and sweetness by leaving some mucilage during drying", "Wet-hulled processing — used to achieve the earthy, heavy-bodied character typical of Ethiopian highland coffees"], answer: 1, feedback: "Ethiopia is famous for both washed and natural processing, but natural processing is particularly iconic in regions like Yirgacheffe and Harrar. In natural processing, the whole coffee cherry dries in the sun with the fruit intact — this imparts intense fruit-forward, wine-like, and berry-rich flavors to the bean. The result is some of the most complex and distinctive coffees in the world." },
-  { q: "What is 'washed' (or 'wet') coffee processing and what flavor profile does it typically produce?", opts: ["The coffee cherry is dried whole and then washed — removing the dried fruit skin before roasting", "The coffee cherry's fruit is removed before drying, allowing the bean to dry cleanly — producing bright, clean, and origin-forward cups", "Beans are soaked in water for 72 hours after roasting to reduce acidity and create a smoother flavor profile", "Coffee is processed using only water for extraction — distinguishing it from espresso which uses pressurized water"], answer: 1, feedback: "In washed processing, the coffee cherry's fruit (pulp) is removed mechanically before the bean dries. The bean ferments in water to remove remaining mucilage, then dries cleanly. Without the fruit influencing the cup, washed coffees express the bean's natural character — typically brighter, cleaner, more nuanced, and with higher acidity than naturally processed coffees." },
-  { q: "What is 'honey' coffee processing and how does it differ from washed and natural methods?", opts: ["Coffee cherries are soaked in honey solutions during fermentation, which adds natural sweetness to the cup profile", "Some fruit mucilage is left on the bean during drying — creating a cup between washed (clean) and natural (fruity) in character", "Beans are dried with a thin layer of honey applied to preserve moisture and prevent over-drying in hot climates", "A washed method used exclusively in Central America where local honey bees fertilize the coffee flowers"], answer: 1, feedback: "Honey processing is the middle ground: the skin is removed but some or all of the mucilage (the sticky, sweet layer beneath the skin) is left on the bean during drying. The amount of mucilage left determines yellow, red, or black honey classifications. The result is a cup that has the cleanliness of washed with some of the fruit sweetness of natural processing." },
-  { q: "What makes Colombian coffee particularly distinctive in the specialty market?", opts: ["Colombia's equatorial location and Pacific rainfall produce the world's highest caffeine content per bean", "Colombia's mountainous terrain, diverse microclimates, and twice-yearly harvests produce balanced, bright, mild coffees of consistent quality", "Colombia's unique processing tradition combines washed and natural methods in a way not found in other origins", "Colombian coffee's earthy, full-bodied character comes from volcanic soil that imparts a distinctive mineral quality"], answer: 1, feedback: "Colombia's geography — the Andes mountain range creating diverse altitudinal zones and microclimates, two main harvest seasons due to different regional climates — produces coffees known for their consistent quality, mild brightness, medium body, and a characteristic clean sweetness. Colombia is the world's largest arabica producer (Brazil grows more but includes robusta)." },
-  { q: "What flavor characteristics are typically associated with coffees from the Sumatra region of Indonesia?", opts: ["Delicate, floral, and citrusy — reflecting high altitude and careful washed processing in the highland farms", "Full-bodied, earthy, herbal, and low-acid — from wet-hulled processing and volcanic soil unique to the region", "Bright, fruity, and wine-like — from the natural processing methods used across most Indonesian growing regions", "Sweet, nutty, and balanced — reflecting the temperate coastal climate of Indonesia's major coffee-growing areas"], answer: 1, feedback: "Sumatran coffees are famous for their full body, low acidity, and earthy, herbal, sometimes mushroom-like complexity. This distinctive profile comes largely from wet-hulled processing (Giling Basah) — unique to Sumatra — where beans are hulled while still high in moisture content, creating a porous structure that absorbs surrounding flavors as they dry." },
-  { q: "What is 'fair trade' certification in the coffee industry?", opts: ["A Starbucks-exclusive program that pays farmers a guaranteed minimum price above commodity market rates", "A third-party certification program that ensures farmers receive a minimum price and meet social and environmental standards", "A government-regulated import standard that verifies coffee was produced without the use of child labor", "A marketing designation used by specialty coffee retailers to indicate premium quality and ethical branding"], answer: 1, feedback: "Fair Trade is an independent third-party certification (primarily through Fair Trade International or Fair Trade USA) that guarantees farmers a minimum price floor, a social premium for community development, and compliance with environmental and labor standards. It's designed to protect smallholder farmers from price volatility and exploitation in global commodity markets." },
-  { q: "What distinguishes Starbucks C.A.F.E. Practices from generic fair trade certification?", opts: ["C.A.F.E. Practices only covers Arabica coffee farms; fair trade also certifies Robusta coffee producers", "C.A.F.E. Practices includes Starbucks' specific quality standards and is verified by an independent third-party auditor", "C.A.F.E. Practices is administered by the same organizations that manage fair trade but with stricter criteria", "C.A.F.E. Practices offers a higher premium payment to farmers than any existing fair trade certification program"], answer: 1, feedback: "C.A.F.E. Practices goes beyond standard fair trade by adding Starbucks' own quality standards and using SCS Global Services (an independent third-party) to verify compliance across all four pillars. It's more comprehensive — covering product quality, economic transparency, social responsibility, and environmental stewardship together in a single evaluation framework." },
-  { q: "What is the coffee 'cherry' and what does it contain?", opts: ["The outer paper-like husk of the dried coffee seed that is removed during the hulling stage of processing", "The fruit of the coffee plant — containing the pulp, mucilage, parchment, silver skin, and the coffee seed (bean) within", "The flower blossom of the Coffea arabica plant that precedes the formation of the coffee fruit", "A term for the reddest, ripest coffee beans that are hand-selected for premium single-origin offerings"], answer: 1, feedback: "A coffee cherry is the fruit of the Coffea plant — it looks like a small, round fruit and turns red (or yellow, purple, or orange depending on variety) when ripe. Inside: fruit skin (exocarp), sweet pulp (mesocarp), mucilage, parchment (endocarp), silver skin (spermoderm), and finally the coffee seed — what we call the 'bean' after processing and drying." },
-  { q: "What altitude is generally considered optimal for high-quality Arabica coffee production?", opts: ["200–600 meters (656–1,968 feet) — warm lowlands that accelerate cherry development and maximize yield", "600–1,000 meters (1,968–3,281 feet) — the moderate altitude range used for commercial commodity coffees", "1,200–2,200 meters (3,937–7,218 feet) — the high altitude range that slows development and concentrates complexity", "Above 2,500 meters (8,202 feet) — extreme altitude where the rarest and most prized coffees are produced"], answer: 2, feedback: "High-quality Arabica typically grows between 1,200 and 2,200 meters above sea level. At these altitudes, cooler temperatures slow the cherry's development — giving more time for complex sugars, acids, and aromatic compounds to form. Slower growth = greater density and complexity in the seed. This is why high-grown coffees (like those from Ethiopia or Guatemala) command premium prices." },
-  { q: "What is the 'coffee belt' and why is coffee only grown in this region?", opts: ["A logistics corridor between major growing countries where coffee is transported before export processing", "The tropical zone between the Tropics of Cancer and Capricorn, where consistent warmth, rainfall, and altitude support Arabica growth", "A protective barrier of certification-only regions where Starbucks exclusively sources its coffee supply", "The geographic boundary between highland and lowland growing regions that determines which variety can be cultivated"], answer: 1, feedback: "The Coffee Belt is the equatorial band between the Tropics of Cancer and Capricorn (roughly 25°N to 30°S latitude) where temperature, rainfall, altitude, and soil conditions align to support Arabica and Robusta cultivation. Outside this zone, conditions are too cold, too hot, or too dry for commercial coffee production. All of the world's coffee — every cup — comes from this band." },
-  { q: "What social responsibility standards does C.A.F.E. Practices evaluate?", opts: ["Farm size, worker nationality, certification costs, and language accessibility of training materials", "Safe working conditions, fair wages, access to housing and education, prohibition of child labor and forced labor", "Worker productivity metrics, cooperative membership requirements, and local union affiliation standards", "Marketing practices, trade partnership agreements, and fair representation in global coffee trade organizations"], answer: 1, feedback: "C.A.F.E. Practices Social Responsibility standards cover: safe, healthy working conditions; fair wages; access to housing, education, and medical care; prohibition of child labor and forced labor; freedom of association (workers' right to organize); and non-discrimination. These standards apply across the entire supply chain — from farms to mills." },
-  { q: "What environmental leadership standards does C.A.F.E. Practices evaluate?", opts: ["Carbon offset purchases, renewable energy use, and annual sustainability reporting to Starbucks headquarters", "Water conservation, waste reduction, protecting biodiversity, preventing soil erosion, and limiting agrochemical use", "Organic certification, zero-pesticide farming, and use of native shade-grown tree species on every farm", "Zero deforestation commitments, solar energy adoption, and compostable packaging for all exported products"], answer: 1, feedback: "C.A.F.E. Practices Environmental Leadership evaluates: water conservation and water quality protection, prevention of soil erosion, protection of biodiversity and natural ecosystems, limiting the use of agrochemicals, prohibition of certain pesticides, and responsible waste management. The goal is ensuring coffee farming enhances, not degrades, the land it relies on." },
-  { q: "What is 'shade-grown' coffee and why is it environmentally significant?", opts: ["Coffee grown under artificial shade cloth to protect delicate Arabica plants from direct tropical sunlight", "Coffee cultivated under a canopy of native trees, which supports biodiversity, prevents erosion, and improves soil health", "A marketing term for coffee harvested during the rainy season when natural cloud cover provides shade conditions", "Coffee grown in regions where tall mountains block direct sunlight during the critical cherry-development period"], answer: 1, feedback: "Shade-grown coffee is cultivated beneath native tree canopies rather than in open sun monocultures. The benefits are significant: shade trees support bird habitat and biodiversity, their leaves add organic matter to the soil, their roots prevent erosion, and slower cherry development under shade often improves cup quality. It's a more sustainable, traditional farming approach." },
-  { q: "What is the Starbucks Farmer Support Center and what does it do?", opts: ["A retail concept within Starbucks stores where customers can learn directly from visiting coffee farmers", "Regional centers where Starbucks agronomists provide farmers with technical assistance, training, and research support", "A financial lending program that provides low-interest loans to coffee farmers expanding their operations", "A certification body managed by Starbucks to verify that farms meet C.A.F.E. Practices requirements"], answer: 1, feedback: "Starbucks operates Farmer Support Centers (FSCs) in key coffee-growing regions — including Costa Rica, Rwanda, China, and others. These centers are staffed by Starbucks agronomists who work directly with farmers to improve yields, implement sustainable practices, respond to climate challenges (like coffee leaf rust), and help farmers achieve C.A.F.E. Practices compliance." },
-  { q: "What is 'economic accountability' in the C.A.F.E. Practices framework?", opts: ["Verifying that Starbucks pays a fair premium above the commodity market price to all certified farms", "Requiring farms to provide transparent financial documentation showing that workers and farmers receive fair payment", "Ensuring that all certified farms participate in a profit-sharing agreement with the Starbucks Corporation", "Auditing cooperative financial management to verify that member farmers receive equitable dividend payments"], answer: 1, feedback: "Economic Accountability requires farms and supply chain actors to provide transparent financial documentation showing that economic benefits — particularly fair payment — flow appropriately through the supply chain to farmers and workers. It's about ensuring that the premium paid for quality and ethical certification actually reaches the people who produced the coffee." },
-  { q: "Why does Starbucks commit to ethical sourcing rather than simply buying the cheapest available coffee?", opts: ["Because premium coffee commands higher retail prices that directly justify increased sourcing costs", "Because sustainable, ethical supply chains ensure the long-term viability of coffee farming and Starbucks' own future", "Because government regulations require all major food companies to comply with ethical sourcing standards", "Because customers increasingly demand ethical certifications before they will consider purchasing a brand's products"], answer: 1, feedback: "Starbucks' commitment to ethical sourcing is fundamentally self-interested — in the best way. If farmers can't earn a living, they leave coffee farming. If environments degrade, yields fall and quality suffers. Starbucks' promise to 'ensure the future of coffee for all' is both moral and strategic: without ethical sourcing, there is no future supply chain for the business." },
-  { q: "What does 'product quality' mean in the C.A.F.E. Practices evaluation framework?", opts: ["Verifying that all certified farms use Arabica varieties rather than Robusta to meet Starbucks' cup quality standards", "Requiring farms to meet Starbucks' rigorous sensory and physical quality standards as a condition of certification", "Ensuring that farms produce a minimum volume of coffee per hectare to justify Starbucks' sourcing commitment", "Confirming that all processing equipment on certified farms meets Starbucks' technical specifications"], answer: 1, feedback: "Product Quality in C.A.F.E. Practices means the coffee must meet Starbucks' cup quality standards — passing sensory evaluation (cupping) and physical quality checks. Quality certification isn't about just being ethical — it must also produce excellent coffee. This dual requirement ensures that doing the right thing and making the best cup are not in conflict." },
-  { q: "What is 'cupping' in the coffee industry and how is it used in sourcing?", opts: ["A machine-controlled extraction method used to produce consistent espresso shots at the roasting facility", "A standardized sensory evaluation process where trained tasters assess coffee quality by smelling, slurping, and analyzing flavor", "A grading system that scores coffee beans on their physical appearance, including size, color, and defect count", "A brewing method using a French press for quick, high-volume sampling at origin during harvest season"], answer: 1, feedback: "Cupping is the universal sensory evaluation protocol in specialty coffee — coffee is ground, steeped in hot water without filtering, and then assessed by trained cuppers who smell the grounds, break the crust, and slurp samples to aerate the coffee across the palate. Starbucks uses cupping to evaluate sourced coffees for quality, consistency, and flavor profile approval." },
-  { q: "What is the historical origin of the word 'coffee' and its journey from Ethiopia to the world?", opts: ["'Coffee' derives from the Dutch word 'koffie' — brought to Europe by Dutch traders in the 17th century", "The English word 'coffee' traces through Turkish 'kahveh' and Arabic 'qahwa' — originating from Ethiopia's Kaffa region", "Coffee was named by Italian merchants who traded the product across the Mediterranean in the 16th century", "The word 'coffee' was coined by French botanists who first described Coffea arabica as a flowering plant"], answer: 1, feedback: "The etymology traces: from the Kaffa region of Ethiopia (where the plant originated), to Arabic 'qahwa' (possibly meaning 'that which prevents sleep'), to Turkish 'kahveh', to Dutch 'koffie', to English 'coffee'. The word's journey mirrors the actual spread of coffee as a beverage — from Ethiopian highlands, through Arabian trade routes, to European coffeehouses." },
-  { q: "What is the significance of the Arabian coffee trade in the 15th and 16th centuries?", opts: ["Arab traders introduced coffee to East Africa, where it was cultivated commercially for the first time in history", "Yemen and the Arabian Peninsula were the first to cultivate and trade coffee commercially, establishing the global trade network", "Arab scientists isolated caffeine from coffee in the 15th century, leading to the first medical applications of the beverage", "Arab merchants developed the first espresso preparation method, which was later refined by Italian traders in the 16th century"], answer: 1, feedback: "Yemen's port of Mocha (Al-Mukha) was the first major commercial hub for coffee export — Sufi monks used it for night prayers, and coffeehouses (qahveh khaneh) spread across the Arab world as centers of intellectual and social life. Yemen's monopoly on coffee trade lasted for nearly two centuries before plants were smuggled to other regions." },
-  { q: "What is the story of coffee's arrival in Europe and the rise of the coffeehouse?", opts: ["Coffee arrived via the Silk Road trade routes from China and Japan in the late 16th century as an exotic spice", "Coffee arrived via Venice from Ottoman traders in the early 17th century, spawning coffeehouses as centers of commerce and debate", "Coffee was introduced to Europe by Spanish conquistadors returning from the Americas in the early 1500s", "British East India Company merchants brought coffee from India to London in the late 17th century via colonial trade routes"], answer: 1, feedback: "Coffee reached Europe primarily through Venice from Ottoman traders in the early 17th century. European coffeehouses — like the original Lloyd's of London coffee house — became centers of commerce, news, and intellectual debate. They were called 'penny universities' in England because a penny (the price of coffee) bought hours of conversation and access to newspapers." },
-  { q: "What role did the Ottoman Empire play in the spread of coffee?", opts: ["Ottoman scientists refined the art of espresso preparation, which was later adopted by Italian coffee culture", "The Ottoman Empire spread coffee cultivation and coffeehouse culture across the Middle East, North Africa, and into Europe", "Ottoman traders replaced wine with coffee across the empire — the first formal prohibition of alcohol in favor of coffee", "The Ottoman Empire developed the first coffee grading system still used in modern specialty coffee evaluation"], answer: 1, feedback: "The Ottoman Empire was instrumental in spreading coffee from Yemen across the Middle East and into Europe. Istanbul's coffeehouses became famous cultural institutions. Ottoman traders brought the drink (and eventually the beans) to North Africa, Persia, and eventually — through trade and diplomatic contact — to Europe. The Siege of Vienna in 1683 is often credited with leaving behind coffee sacks that kickstarted Vienna's café culture." },
-];
-
-const pools = [mod0Pool, mod1Pool, mod2Pool, mod3Pool, mod4Pool];
-
-// Initialize all quizzes
-['mod0','mod1','mod2','mod3','mod4'].forEach((id, i) => {
-  buildQuiz('quiz_' + id, pools[i], i);
-});
 </script>
 </body>
 </html>
